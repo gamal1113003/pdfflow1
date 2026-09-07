@@ -50,7 +50,9 @@ export function Logo({ className }: { className?: string }) {
       aria-label="orzix home"
     >
       <LogoMark />
-      <span className="font-display text-[1.35rem] font-semibold tracking-[-0.03em] text-foreground">
+      {/* Five short lowercase letters carry less weight than a longer wordmark,
+          so the type is set larger and tighter to balance the mark. */}
+      <span className="font-display text-[1.9rem] font-bold leading-none tracking-[-0.02em] text-foreground">
         orzix
       </span>
     </Link>
