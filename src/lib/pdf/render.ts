@@ -11,10 +11,14 @@ let pdfjsPromise: Promise<PdfJs> | null = null;
 export async function getPdfJs(): Promise<PdfJs> {
   if (!pdfjsPromise) {
     pdfjsPromise = import("pdfjs-dist").then((pdfjs) => {
-      pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-        "pdfjs-dist/build/pdf.worker.min.mjs",
-        import.meta.url,
-      ).toString();
+      // Served as a static file from /public rather than resolved through
+      // `new URL(..., import.meta.url)`. The bundler rewrite of that pattern
+      // is fragile in Next.js and fails at runtime with
+      // "__webpack_require__.U is not a constructor".
+      //
+      // The file must be copied into /public whenever pdfjs-dist is updated:
+      //   copy node_modules\pdfjs-dist\build\pdf.worker.min.mjs public\
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
       return pdfjs;
     });
   }
