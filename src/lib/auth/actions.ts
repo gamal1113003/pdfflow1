@@ -8,6 +8,9 @@ import { site } from "@/lib/site";
 
 export type ActionState = { error?: string; message?: string };
 
+const ALREADY_REGISTERED =
+  "An account with this email already exists. Sign in instead, or reset your password if you have forgotten it.";
+
 const NOT_CONFIGURED =
   "Accounts are not switched on for this build. Every browser-based PDF tool still works without one.";
 
@@ -35,7 +38,7 @@ export async function signUp(_prev: ActionState, formData: FormData): Promise<Ac
   if (passwordProblem) return { error: passwordProblem };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -44,7 +47,26 @@ export async function signUp(_prev: ActionState, formData: FormData): Promise<Ac
     },
   });
 
-  if (error) return { error: error.message };
+  if (error) {
+    // Supabase returns this when "Prevent use of leaked passwords" or the
+    // duplicate-email check rejects the signup.
+    if (/already registered|already exists|User already/i.test(error.message)) {
+      return { error: ALREADY_REGISTERED };
+    }
+    return { error: error.message };
+  }
+
+  // With "Confirm email" on, Supabase deliberately hides duplicates: it
+  // returns a user object with an empty identities array rather than an error,
+  // so the response looks identical whether or not the address was taken.
+  //
+  // Checking identities is what makes the explicit message possible. It also
+  // means this site now confirms which email addresses have accounts — an
+  // attacker can test a list of addresses and learn who your users are. That
+  // trade-off was made deliberately; see the note in the signup page.
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    return { error: ALREADY_REGISTERED };
+  }
 
   return {
     message:
