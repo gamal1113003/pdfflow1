@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { LanguageToggle } from "@/components/site/LanguageToggle";
 import { ToolIcon } from "@/components/tools/ToolIcon";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,17 +18,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { popularTools, tools } from "@/lib/tools";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { translateTool } from "@/lib/i18n/toolStrings";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { label: "Compress", href: "/compress-pdf" },
-  { label: "Convert", href: "/tools?category=convert-from-pdf" },
-  { label: "Organize", href: "/tools?category=organize" },
-  { label: "Edit", href: "/tools?category=edit" },
+  { key: "compress" as const, href: "/compress-pdf" },
+  { key: "convert" as const, href: "/tools?category=convert-from-pdf" },
+  { key: "organize" as const, href: "/tools?category=organize" },
+  { key: "edit" as const, href: "/tools?category=edit" },
 ];
 
 export function Header() {
   const pathname = usePathname();
+  const { language, t } = useLanguage();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -50,17 +54,17 @@ export function Header() {
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
             <DropdownMenu>
               <DropdownMenuTrigger className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground">
-                Tools
+                {t.nav.tools}
                 <ChevronDown className="size-4" aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[22rem]">
-                <DropdownMenuLabel>Most used</DropdownMenuLabel>
+                <DropdownMenuLabel>{t.nav.mostUsed}</DropdownMenuLabel>
                 <div className="grid grid-cols-2 gap-0.5">
                   {popularTools.slice(0, 8).map((tool) => (
                     <DropdownMenuItem key={tool.slug} asChild>
                       <Link href={`/${tool.slug}`}>
                         <ToolIcon name={tool.icon} className="size-4 text-primary" />
-                        <span className="truncate">{tool.name}</span>
+                        <span className="truncate">{translateTool(language, tool.slug, tool).name}</span>
                       </Link>
                     </DropdownMenuItem>
                   ))}
@@ -68,7 +72,7 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/tools" className="font-medium text-primary">
-                    Browse all {tools.length} tools
+                    {t.nav.browseAll}
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -76,45 +80,52 @@ export function Header() {
 
             {NAV.map((item) => (
               <Link
-                key={item.label}
+                key={item.key}
                 href={item.href}
                 className={cn(
                   "inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                   pathname === item.href && "text-foreground",
                 )}
               >
-                {item.label}
+                {t.nav[item.key]}
               </Link>
             ))}
           </nav>
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <LanguageToggle />
           <ThemeToggle />
           <Link
             href="/pricing"
             className="inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Pricing
+            {t.nav.pricing}
           </Link>
           <Button asChild variant="ghost" size="sm">
             <Link href="/login">Log in</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/signup">Get started</Link>
+            <Link href="/signup">{t.nav.getStarted}</Link>
           </Button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          className="grid size-10 place-items-center rounded-xl border border-border text-foreground lg:hidden"
-        >
-          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <Button asChild size="sm" variant="secondary">
+            <Link href="/login">Log in</Link>
+          </Button>
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            className="grid size-10 shrink-0 place-items-center rounded-xl border border-border text-foreground"
+          >
+            <span className="sr-only">{open ? t.nav.closeMenu : t.nav.openMenu}</span>
+            {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -123,14 +134,23 @@ export function Header() {
           className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-background lg:hidden"
         >
           <div className="container space-y-8 py-7">
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild variant="secondary" size="lg">
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button asChild size="lg">
+                <Link href="/signup">{t.nav.getStarted}</Link>
+              </Button>
+            </div>
+
             <div className="flex items-center justify-between">
-              <span className="font-display text-sm font-medium text-muted-foreground">Menu</span>
+              <span className="font-display text-sm font-medium text-muted-foreground">{t.nav.menu}</span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="grid size-10 place-items-center rounded-xl border border-border"
               >
-                <span className="sr-only">Close menu</span>
+                <span className="sr-only">{t.nav.closeMenu}</span>
                 <X className="size-5" aria-hidden />
               </button>
             </div>
@@ -145,35 +165,31 @@ export function Header() {
                   <span className="grid size-9 place-items-center rounded-lg bg-primary-soft text-primary">
                     <ToolIcon name={tool.icon} className="size-4" />
                   </span>
-                  <span className="text-[0.95rem] font-medium">{tool.name}</span>
+                  <span className="text-[0.95rem] font-medium">{translateTool(language, tool.slug, tool).name}</span>
                 </Link>
               ))}
             </div>
 
             <nav aria-label="Sections" className="grid gap-1 border-t border-border pt-6">
               <Link href="/tools" className="py-2.5 text-[1.05rem] font-medium">
-                All tools
+                {t.nav.browseAll}
               </Link>
               {NAV.map((item) => (
-                <Link key={item.label} href={item.href} className="py-2.5 text-[1.05rem] font-medium">
-                  {item.label}
+                <Link key={item.key} href={item.href} className="py-2.5 text-[1.05rem] font-medium">
+                  {t.nav[item.key]}
                 </Link>
               ))}
               <Link href="/pricing" className="py-2.5 text-[1.05rem] font-medium">
-                Pricing
+                {t.nav.pricing}
               </Link>
             </nav>
 
             <div className="flex items-center justify-between gap-3 border-t border-border pt-6">
-              <ThemeToggle />
               <div className="flex items-center gap-2">
-                <Button asChild variant="secondary">
-                  <Link href="/login">Log in</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/signup">Get started</Link>
-                </Button>
+                <LanguageToggle />
+                <ThemeToggle />
               </div>
+
             </div>
           </div>
         </div>
