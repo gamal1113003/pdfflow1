@@ -1,0 +1,63 @@
+"use client";
+
+import {
+  ArrowLeftRight,
+  Combine,
+  Crop,
+  Droplets,
+  FileOutput,
+  FileText,
+  FileType2,
+  Image,
+  ImagePlus,
+  Images,
+  Languages,
+  Lock,
+  LockOpen,
+  Minimize2,
+  MonitorPlay,
+  PenLine,
+  PencilRuler,
+  Presentation,
+  RotateCw,
+  ScanText,
+  Scissors,
+  Sheet,
+  Signature,
+  Table2,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
+
+const ICONS: Record<string, LucideIcon> = {
+  ArrowLeftRight,
+  Combine,
+  Crop,
+  Droplets,
+  FileOutput,
+  FileText,
+  FileType2,
+  Image,
+  ImagePlus,
+  Images,
+  Languages,
+  Lock,
+  LockOpen,
+  Minimize2,
+  MonitorPlay,
+  PenLine,
+  PencilRuler,
+  Presentation,
+  RotateCw,
+  ScanText,
+  Scissors,
+  Sheet,
+  Signature,
+  Table2,
+  Trash2,
+};
+
+export function ToolIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICONS[name] ?? FileText;
+  return <Icon className={className} aria-hidden="true" />;
+}
