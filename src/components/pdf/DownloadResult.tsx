@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Check, Download, RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -28,8 +29,29 @@ export function DownloadResult({
   onDelete?: () => void;
   extraActions?: React.ReactNode;
 }) {
+  const panel = useRef<HTMLDivElement>(null);
+
+  // Bring the result into view. After a long job the person is often scrolled
+  // somewhere else on the page, or the layout has shifted, and the finished
+  // file is easy to miss.
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    panel.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "center",
+    });
+    // Move keyboard focus too, so screen readers announce the result.
+    panel.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
-    <div className="animate-fade-in rounded-2xl border border-border bg-card p-6 shadow-lifted sm:p-8">
+    <div
+      ref={panel}
+      tabIndex={-1}
+      role="status"
+      aria-live="polite"
+      className="animate-fade-in scroll-mt-24 rounded-2xl border border-border bg-card p-6 shadow-lifted outline-none sm:p-8"
+    >
       <div className="flex items-center gap-3">
         <span className="grid size-10 place-items-center rounded-full bg-success-soft text-success">
           <Check className="size-5" aria-hidden="true" />
