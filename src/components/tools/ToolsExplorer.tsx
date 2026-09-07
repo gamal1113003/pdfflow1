@@ -1,26 +1,48 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { ToolCard } from "@/components/tools/ToolCard";
-import { searchTools, TOOL_CATEGORIES, type ToolCategory } from "@/lib/tools";
+import { searchTools, type ToolCategory } from "@/lib/tools";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { fill } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
 export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: ToolCategory | "all" }) {
   const [category, setCategory] = useState<ToolCategory | "all">(initialCategory);
   const [query, setQuery] = useState("");
+  const { t } = useLanguage();
+
+  // The header links point at /tools?category=organize and similar. Moving
+  // between them is a navigation within the same route, so this component is
+  // not remounted and the initial state would otherwise stick on whichever
+  // category was opened first.
+  useEffect(() => {
+    setCategory(initialCategory);
+  }, [initialCategory]);
 
   const results = useMemo(() => searchTools(query, category), [query, category]);
+
+  const categories = [
+    { id: "all" as const, label: t.toolsPage.all },
+    { id: "convert-from-pdf" as const, label: t.toolsPage.convertFrom },
+    { id: "convert-to-pdf" as const, label: t.toolsPage.convertTo },
+    { id: "compress" as const, label: t.toolsPage.compress },
+    { id: "organize" as const, label: t.toolsPage.organize },
+    { id: "edit" as const, label: t.toolsPage.edit },
+    { id: "security" as const, label: t.toolsPage.security },
+    { id: "image" as const, label: t.toolsPage.image },
+  ];
 
   return (
     <div>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div
           role="tablist"
-          aria-label="Tool categories"
+          aria-label={t.toolsPage.categories}
           className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 lg:mx-0 lg:flex-wrap lg:px-0"
         >
-          {TOOL_CATEGORIES.map((entry) => {
+          {categories.map((entry) => {
             const active = category === entry.id;
             return (
               <button
@@ -48,14 +70,14 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
             aria-hidden="true"
           />
           <label htmlFor="tool-search" className="sr-only">
-            Search PDF tools
+            {t.toolsPage.search}
           </label>
           <input
             id="tool-search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search PDF tools..."
+            placeholder={t.toolsPage.search}
             className="h-11 w-full rounded-full border border-input bg-card pl-10 pr-10 text-[0.95rem] shadow-subtle transition-colors placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
           />
           {query && (
@@ -64,7 +86,7 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
               onClick={() => setQuery("")}
               className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
             >
-              <span className="sr-only">Clear search</span>
+              <span className="sr-only">{t.toolsPage.clearSearch}</span>
               <X className="size-3.5" aria-hidden="true" />
             </button>
           )}
@@ -72,8 +94,10 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
       </div>
 
       <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
-        {results.length} {results.length === 1 ? "tool" : "tools"}
-        {query && ` matching “${query}”`}
+        {fill(results.length === 1 ? t.toolsPage.resultOne : t.toolsPage.resultMany, {
+          count: results.length,
+        })}
+        {query && ` — ${t.toolsPage.matching} “${query}”`}
       </p>
 
       {results.length > 0 ? (
@@ -84,9 +108,9 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
         </div>
       ) : (
         <div className="mt-5 rounded-2xl border border-dashed border-border bg-muted/40 px-6 py-16 text-center">
-          <p className="font-display text-lg font-medium">No tool matches that search</p>
+          <p className="font-display text-lg font-medium">{t.toolsPage.emptyTitle}</p>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Try a different word, or clear the filters to see everything.
+            {t.toolsPage.emptyBody}
           </p>
           <button
             type="button"
@@ -96,7 +120,7 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
             }}
             className="mt-5 text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
-            Show all tools
+            {t.toolsPage.showAll}
           </button>
         </div>
       )}
