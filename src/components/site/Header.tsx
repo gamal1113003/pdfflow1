@@ -52,7 +52,10 @@ export function Header() {
           <Logo />
 
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
-            <DropdownMenu>
+            {/* modal={false} stops Radix locking page scroll while the menu is
+                open. The lock removes the scrollbar, which shifts the whole
+                page sideways by its width and snaps back on close. */}
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground">
                 {t.nav.tools}
                 <ChevronDown className="size-4" aria-hidden="true" />
