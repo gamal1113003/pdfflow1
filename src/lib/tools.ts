@@ -367,6 +367,22 @@ export const tools: Tool[] = [
     },
   },
   {
+    slug: "flatten-pdf",
+    name: "Flatten PDF",
+    description: "Remove form fields and annotations, keeping the look.",
+    lede: "Turn filled forms and comments into fixed page content that cannot be edited.",
+    categories: ["edit", "security"],
+    icon: "Layers",
+    widget: "backend",
+    runsInBrowser: false,
+    config: { accept: ["pdf"], outputLabel: "Flattened PDF" },
+    seo: {
+      title: "Flatten PDF Online — Lock Form Fields | orzix",
+      description:
+        "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
     slug: "watermark-pdf",
     name: "Watermark PDF",
     description: "Add custom text or image watermarks.",
