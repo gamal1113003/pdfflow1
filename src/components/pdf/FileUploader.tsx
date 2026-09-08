@@ -27,7 +27,8 @@ export type FileUploaderProps = {
 /** A long extension list is unreadable, so it is summarised. */
 function describeAccepted(extensions: string[], maxBytes: number): string {
   const size = `up to ${Math.round(maxBytes / 1024 / 1024)} MB`;
-    const has = (name: string) => extensions.includes(name);
+  const has = (name: string) => extensions.includes(name);
+
   const groups: string[] = [];
   if (has("pdf")) groups.push("PDF");
   if (has("doc") || has("docx")) groups.push("DOC");
@@ -35,11 +36,12 @@ function describeAccepted(extensions: string[], maxBytes: number): string {
   if (has("ppt") || has("pptx")) groups.push("PPT");
   if (has("png")) groups.push("PNG");
   if (has("jpg") || has("jpeg")) groups.push("JPG");
+
   if (groups.length > 0) {
     return `${groups.join(", ")} · ${size}`;
   }
-  }
   return `${extensions.map((e) => e.toUpperCase()).join(", ")} · ${size}`;
+}
 
 
 export function FileUploader({
