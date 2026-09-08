@@ -472,7 +472,7 @@ export const tools: Tool[] = [
     icon: "ScanText",
     widget: "backend",
     runsInBrowser: false,
-    config: { accept: ["pdf"], outputLabel: "Searchable PDF" },
+    config: { accept: ["pdf","doc","txt"], outputLabel: "Searchable PDF" },
     seo: {
       title: "OCR PDF Online — Make Scans Searchable | orzix",
       description:
