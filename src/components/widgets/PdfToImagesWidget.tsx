@@ -15,6 +15,7 @@ import { useSinglePdf } from "@/components/widgets/useSinglePdf";
 import { downloadBlob } from "@/lib/pdf/download";
 import { pdfToImages, zipFiles, type ExportedImage } from "@/lib/pdf/images";
 import { baseName, formatBytes } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 export function PdfToImagesWidget() {
   const { pdf, loading, error, setError, load, clear } = useSinglePdf();
@@ -116,7 +117,7 @@ export function PdfToImagesWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

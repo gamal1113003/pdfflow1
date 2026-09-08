@@ -20,6 +20,7 @@ import { planFromPageCount, type PagePlan } from "@/lib/pdf/organize";
 import { extractPages, splitByRanges, splitEveryPage, type SplitResult } from "@/lib/pdf/split";
 import { zipFiles } from "@/lib/pdf/images";
 import { formatBytes, parsePageRanges } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 type SplitMode = "selected" | "every" | "ranges";
 
@@ -130,7 +131,7 @@ export function SplitWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

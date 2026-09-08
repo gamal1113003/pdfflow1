@@ -17,6 +17,7 @@ import { downloadBlob } from "@/lib/pdf/download";
 import { applyAnnotations, TEXT_FONT_STACK, type Annotation, type Point } from "@/lib/pdf/annotate";
 import { openDocument, renderPage } from "@/lib/pdf/render";
 import { formatBytes, uid, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 const TEXT_SIZE = 0.026;
 const STROKE_WIDTH = 0.004;
@@ -295,7 +296,7 @@ export function EditContentWidget() {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, "edited");
+    const fileName = withSuffix(pdf.displayName, "edited");
     return (
       <DownloadResult
         title="Your edited PDF is ready"
@@ -322,7 +323,7 @@ export function EditContentWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

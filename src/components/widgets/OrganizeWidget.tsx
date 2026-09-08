@@ -17,6 +17,7 @@ import { downloadBlob } from "@/lib/pdf/download";
 import { applyPagePlan, planFromPageCount, type PagePlan } from "@/lib/pdf/organize";
 import type { Tool } from "@/lib/tools";
 import { formatBytes, moveItem, uid, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 type Mode = "rotate" | "delete" | "extract" | "reorder" | "edit";
 
@@ -165,7 +166,7 @@ export function OrganizeWidget({ tool }: { tool: Tool }) {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, copy.suffix);
+    const fileName = withSuffix(pdf.displayName, copy.suffix);
     return (
       <DownloadResult
         fileName={fileName}
@@ -195,7 +196,7 @@ export function OrganizeWidget({ tool }: { tool: Tool }) {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={handleFiles} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={handleFiles} />
       ) : (
         <>
           <FileSummary

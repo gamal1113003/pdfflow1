@@ -14,6 +14,7 @@ import { COMPRESSION_LEVELS, compressPdf, type CompressionLevel } from "@/lib/pd
 import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
 import { formatBytes, percentSaved, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 export function CompressWidget() {
   const { pdf, loading, error, setError, load, clear } = useSinglePdf();
@@ -54,7 +55,7 @@ export function CompressWidget() {
     const grew = result.bytes.byteLength >= pdf.bytes.byteLength;
     return (
       <DownloadResult
-        fileName={withSuffix(pdf.file.name, "compressed")}
+        fileName={withSuffix(pdf.displayName, "compressed")}
         stats={[
           { label: "Original size", value: formatBytes(pdf.bytes.byteLength) },
           { label: "New size", value: formatBytes(result.bytes.byteLength) },
@@ -70,7 +71,7 @@ export function CompressWidget() {
         downloadLabel="Download PDF"
         restartLabel="Compress another PDF"
         onDownload={() =>
-          downloadBlob(toBlob(result.bytes), withSuffix(pdf.file.name, "compressed"))
+          downloadBlob(toBlob(result.bytes), withSuffix(pdf.displayName, "compressed"))
         }
         onRestart={reset}
         onDelete={reset}
@@ -82,11 +83,11 @@ export function CompressWidget() {
     <WidgetStack>
       {!pdf ? (
         <FileUploader
-          extensions={["pdf"]}
+          extensions={ACCEPTED_INPUT}
           title="Drop your PDF here"
           hint="or choose a file from your device"
           buttonLabel="Choose PDF"
-          disabled={loading}
+          disabled={loading} busy={loading}
           onFiles={load}
         />
       ) : (

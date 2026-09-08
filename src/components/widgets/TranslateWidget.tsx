@@ -17,6 +17,7 @@ import { downloadBlob } from "@/lib/pdf/download";
 import { buildTranslatedPdf, extractPageText, translatePages } from "@/lib/pdf/translate";
 import { TRANSLATE_LANGUAGES } from "@/lib/services/translationService";
 import { formatBytes, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 export function TranslateWidget() {
   const { pdf, loading, error, setError, load, clear } = useSinglePdf();
@@ -74,7 +75,7 @@ export function TranslateWidget() {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, `translated-${target.toLowerCase()}`);
+    const fileName = withSuffix(pdf.displayName, `translated-${target.toLowerCase()}`);
     return (
       <DownloadResult
         title="Your translated PDF is ready"
@@ -97,7 +98,7 @@ export function TranslateWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

@@ -16,6 +16,7 @@ import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
 import { signPdf } from "@/lib/pdf/sign";
 import { formatBytes, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 export function SignWidget() {
   const { pdf, loading, error, setError, load, clear } = useSinglePdf();
@@ -83,7 +84,7 @@ export function SignWidget() {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, "signed");
+    const fileName = withSuffix(pdf.displayName, "signed");
     return (
       <DownloadResult
         title="Your signed PDF is ready"
@@ -106,7 +107,7 @@ export function SignWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

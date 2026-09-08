@@ -9,15 +9,19 @@ import { ProcessingProgress } from "@/components/pdf/ProcessingProgress";
 import { PDFPageThumbnail } from "@/components/pdf/PDFPageThumbnail";
 import { Button } from "@/components/ui/button";
 import { WidgetStack } from "@/components/widgets/WidgetShell";
-import { getPdfInfo, readFileBytes, toBlob } from "@/lib/pdf/document";
+import { getPdfInfo, toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
+import { ingestAsPdf } from "@/lib/pdf/ingest";
 import { mergePdfs } from "@/lib/pdf/merge";
 import { openDocument, renderPage } from "@/lib/pdf/render";
 import { cn, formatBytes, moveItem, uid } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 type Entry = {
   id: string;
   file: File;
+  /** PDF bytes, converted from the upload where necessary. */
+  bytes: Uint8Array | null;
   pageCount: number | null;
   thumbnail: string | null;
 };
@@ -31,13 +35,16 @@ export function MergeWidget() {
 
   useEffect(() => {
     let cancelled = false;
-    const pending = entries.filter((entry) => entry.thumbnail === null && entry.pageCount === null);
+    const pending = entries.filter((entry) => entry.bytes === null && entry.thumbnail === null);
     if (pending.length === 0) return;
 
     (async () => {
       for (const entry of pending) {
         try {
-          const bytes = await readFileBytes(entry.file);
+          // Word files, images and text are converted to PDF here, so they can
+          // be merged alongside real PDFs.
+          const ingested = await ingestAsPdf(entry.file);
+          const bytes = ingested.bytes;
           const info = await getPdfInfo(bytes);
           const doc = await openDocument(bytes);
           const page = await renderPage(doc, 1, { maxEdge: 220 });
@@ -46,14 +53,14 @@ export function MergeWidget() {
           setEntries((current) =>
             current.map((item) =>
               item.id === entry.id
-                ? { ...item, pageCount: info.pageCount, thumbnail: page.dataUrl }
+                ? { ...item, bytes, pageCount: info.pageCount, thumbnail: page.dataUrl }
                 : item,
             ),
           );
         } catch {
           if (cancelled) return;
           setEntries((current) => current.filter((item) => item.id !== entry.id));
-          setError(`${entry.file.name} could not be read as a PDF, so it was skipped.`);
+          setError(`${entry.file.name} could not be read, so it was skipped.`);
         }
       }
     })();
@@ -67,7 +74,13 @@ export function MergeWidget() {
     setError(null);
     setEntries((current) => [
       ...current,
-      ...files.map((file) => ({ id: uid(), file, pageCount: null, thumbnail: null })),
+      ...files.map((file) => ({
+        id: uid(),
+        file,
+        bytes: null,
+        pageCount: null,
+        thumbnail: null,
+      })),
     ]);
   }
 
@@ -80,8 +93,14 @@ export function MergeWidget() {
     setError(null);
     setProgress({ done: 0, total: entries.length });
     try {
+      const ready = entries.filter((entry) => entry.bytes !== null);
+      if (ready.length < entries.length) {
+        setError("Some files are still being prepared. Wait a moment and try again.");
+        return;
+      }
+
       const bytes = await mergePdfs(
-        entries.map((entry) => entry.file),
+        ready.map((entry) => ({ name: entry.file.name, bytes: entry.bytes as Uint8Array })),
         (done, total) => setProgress({ done, total }),
       );
       setResult(bytes);
@@ -127,7 +146,7 @@ export function MergeWidget() {
   return (
     <WidgetStack>
       <FileUploader
-        extensions={["pdf"]}
+        extensions={ACCEPTED_INPUT}
         multiple
         size={entries.length > 0 ? "sm" : "lg"}
         title={entries.length > 0 ? "Add more PDFs" : "Drop your PDFs here"}

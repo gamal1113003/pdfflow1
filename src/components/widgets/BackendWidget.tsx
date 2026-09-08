@@ -18,6 +18,8 @@ import {
   type ServiceJob,
 } from "@/lib/services/pdfService";
 import { downloadBlob } from "@/lib/pdf/download";
+import { ACCEPTED_INPUT, ingestAsPdf, needsConversion } from "@/lib/pdf/ingest";
+import { toBlob } from "@/lib/pdf/document";
 import type { Tool } from "@/lib/tools";
 import { formatBytes } from "@/lib/utils";
 
@@ -29,7 +31,11 @@ type Fields = "set-password" | "enter-password" | undefined;
  * real — only the conversion itself is delegated to `pdfService`.
  */
 export function BackendWidget({ tool }: { tool: Tool }) {
-  const extensions = (tool.config?.accept as string[] | undefined) ?? ["pdf"];
+  const acceptedFormats = (tool.config?.accept as string[] | undefined) ?? ["pdf"];
+  // A tool whose input is a PDF can also take the formats we can convert to
+  // one. A tool whose input is a Word file keeps its own narrower list.
+  const takesPdf = acceptedFormats.length === 1 && acceptedFormats[0] === "pdf";
+  const extensions = takesPdf ? ACCEPTED_INPUT : acceptedFormats;
   const fields = tool.config?.fields as Fields;
   const outputLabel = (tool.config?.outputLabel as string | undefined) ?? "Converted file";
 
@@ -67,9 +73,18 @@ export function BackendWidget({ tool }: { tool: Tool }) {
     setError(null);
     setUnavailable(false);
     try {
+      // Convert first where the tool expects a PDF and the upload is not one.
+      let toSend = file;
+      if (takesPdf && needsConversion(file)) {
+        const ingested = await ingestAsPdf(file);
+        toSend = new File([toBlob(ingested.bytes)], ingested.fileName, {
+          type: "application/pdf",
+        });
+      }
+
       const output = await runServiceJob(
         tool.slug as ServiceJob,
-        file,
+        toSend,
         fields ? { password } : {},
       );
       setResult(output);

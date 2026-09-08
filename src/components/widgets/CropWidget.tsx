@@ -17,6 +17,7 @@ import { downloadBlob } from "@/lib/pdf/download";
 import { cropPdf, FULL_PAGE, type CropRect, type OutputPageSize } from "@/lib/pdf/crop";
 import { openDocument, renderPage } from "@/lib/pdf/render";
 import { formatBytes, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 type Handle = "nw" | "ne" | "sw" | "se";
 type Drag =
@@ -192,7 +193,7 @@ export function CropWidget() {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, "cropped");
+    const fileName = withSuffix(pdf.displayName, "cropped");
     return (
       <DownloadResult
         title="Your cropped PDF is ready"
@@ -222,7 +223,7 @@ export function CropWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

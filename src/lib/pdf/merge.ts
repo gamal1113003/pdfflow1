@@ -1,19 +1,29 @@
 import { PDFDocument } from "pdf-lib";
-import { loadPdf, PdfError, readFileBytes, savePdf } from "@/lib/pdf/document";
+import { loadPdf, PdfError, savePdf } from "@/lib/pdf/document";
 
 export type MergeProgress = (completed: number, total: number, fileName: string) => void;
 
-export async function mergePdfs(files: File[], onProgress?: MergeProgress): Promise<Uint8Array> {
-  if (files.length < 2) {
-    throw new PdfError("Add at least two PDFs to merge.");
+export type MergeSource = { name: string; bytes: Uint8Array };
+
+/**
+ * Combines documents that have already been converted to PDF. Conversion
+ * happens in the widget, so a Word file or a photo can be merged alongside
+ * a PDF.
+ */
+export async function mergePdfs(
+  sources: MergeSource[],
+  onProgress?: MergeProgress,
+): Promise<Uint8Array> {
+  if (sources.length < 2) {
+    throw new PdfError("Add at least two files to merge.");
   }
 
   const merged = await PDFDocument.create();
-  for (const [index, file] of files.entries()) {
-    const source = await loadPdf(await readFileBytes(file));
-    const pages = await merged.copyPages(source, source.getPageIndices());
+  for (const [index, source] of sources.entries()) {
+    const doc = await loadPdf(source.bytes);
+    const pages = await merged.copyPages(doc, doc.getPageIndices());
     pages.forEach((page) => merged.addPage(page));
-    onProgress?.(index + 1, files.length, file.name);
+    onProgress?.(index + 1, sources.length, source.name);
   }
 
   merged.setProducer("orzix");

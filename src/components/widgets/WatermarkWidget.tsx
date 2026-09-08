@@ -17,6 +17,7 @@ import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
 import { watermarkPdf, type WatermarkPosition } from "@/lib/pdf/watermark";
 import { formatBytes, withSuffix } from "@/lib/utils";
+import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
 
 const COLORS = [
   { value: "#6b7280", label: "Grey" },
@@ -68,7 +69,7 @@ export function WatermarkWidget() {
   }
 
   if (result && pdf) {
-    const fileName = withSuffix(pdf.file.name, "watermarked");
+    const fileName = withSuffix(pdf.displayName, "watermarked");
     return (
       <DownloadResult
         fileName={fileName}
@@ -88,7 +89,7 @@ export function WatermarkWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={["pdf"]} disabled={loading} onFiles={load} />
+        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary
