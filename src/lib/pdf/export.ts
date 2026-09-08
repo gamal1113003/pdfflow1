@@ -17,8 +17,9 @@ export async function pdfBackToImage(
 ): Promise<{ blob: Blob; fileName: string }> {
   const images = await pdfToImages(bytes, fileName, {
     format: format === "png" ? "image/png" : "image/jpeg",
-    // Enough resolution that a cropped photo does not come back soft.
-    scale: 3,
+    // Pages are laid out at document size, so a higher factor is needed to
+    // come back at a useful pixel size: 842pt at 5x is about 4200px.
+    scale: 5,
     quality: 0.95,
     pageNumbers: [1],
   });

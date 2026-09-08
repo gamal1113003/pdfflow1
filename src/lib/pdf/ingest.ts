@@ -53,16 +53,33 @@ export function conversionLabel(file: File): string | null {
   return null;
 }
 
+/**
+ * Longest page edge in points. A4 is 842pt tall, so this keeps pages a normal
+ * document size.
+ *
+ * Using one point per pixel instead would make a 3000px photo into a page
+ * 3000pt — roughly 42 inches — across. That is a legal PDF but an unreasonable
+ * one: it prints wrong, and OCR rejects the output as invalid.
+ *
+ * Page size is only the display box. The image itself is embedded at its
+ * original resolution either way, so nothing is thrown away here.
+ */
+const MAX_PAGE_EDGE = 842;
+
 async function imageToPdf(file: File): Promise<Uint8Array> {
   const bytes = await readFileBytes(file);
   const doc = await PDFDocument.create();
   const ext = extensionOf(file);
 
-  const image =
-    ext === "png" ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+  const image = ext === "png" ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
 
-  const page = doc.addPage([image.width, image.height]);
-  page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+  const longest = Math.max(image.width, image.height);
+  const scale = longest > MAX_PAGE_EDGE ? MAX_PAGE_EDGE / longest : 1;
+  const width = Math.round(image.width * scale);
+  const height = Math.round(image.height * scale);
+
+  const page = doc.addPage([width, height]);
+  page.drawImage(image, { x: 0, y: 0, width, height });
   doc.setProducer("orzix");
   return savePdf(doc);
 }
