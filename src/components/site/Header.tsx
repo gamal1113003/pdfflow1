@@ -101,16 +101,16 @@ export function Header() {
           <LanguageToggle />
           <ThemeToggle />
           <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Log in</Link>
+            <Link href={pathFor(language, "/login")}>Log in</Link>
           </Button>
           <Button asChild size="sm">
-            <Link href="/signup">{t.nav.getStarted}</Link>
+            <Link href={pathFor(language, "/signup")}>{t.nav.getStarted}</Link>
           </Button>
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
           <Button asChild size="sm" variant="secondary">
-            <Link href="/login">Log in</Link>
+            <Link href={pathFor(language, "/login")}>Log in</Link>
           </Button>
 
           <button
@@ -131,22 +131,25 @@ export function Header() {
           id="mobile-menu"
           className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-background lg:hidden"
         >
-          <div className="container space-y-8 py-7">
+          <div className="container space-y-6 py-6">
             <div className="grid grid-cols-2 gap-2">
               <Button asChild variant="secondary" size="lg">
-                <Link href="/login">Log in</Link>
+                <Link href={pathFor(language, "/login")}>Log in</Link>
               </Button>
               <Button asChild size="lg">
-                <Link href="/signup">{t.nav.getStarted}</Link>
+                <Link href={pathFor(language, "/signup")}>{t.nav.getStarted}</Link>
               </Button>
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="font-display text-sm font-medium text-muted-foreground">{t.nav.menu}</span>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <ThemeToggle />
+              </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="grid size-10 place-items-center rounded-xl border border-border"
+                className="grid size-10 shrink-0 place-items-center rounded-xl border border-border"
               >
                 <span className="sr-only">{t.nav.closeMenu}</span>
                 <X className="size-5" aria-hidden />
@@ -179,13 +182,6 @@ export function Header() {
               ))}
             </nav>
 
-            <div className="flex items-center justify-between gap-3 border-t border-border pt-6">
-              <div className="flex items-center gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
-
-            </div>
           </div>
         </div>
       )}
