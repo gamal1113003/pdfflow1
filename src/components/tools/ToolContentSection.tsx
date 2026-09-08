@@ -63,7 +63,7 @@ export function ToolContentSection({
               <h2 className="font-display text-display-sm font-semibold">
                 {content.stepsHeading}
               </h2>
-              <ol className="mt-6 space-y-6">
+              <ol className="mt-6 list-none space-y-6 p-0">
                 {content.steps.map((step, index) => (
                   <li key={step.title} className="flex gap-4">
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft font-display text-sm font-semibold text-primary">
