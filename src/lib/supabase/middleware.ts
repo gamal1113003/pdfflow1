@@ -5,6 +5,13 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/sup
 const PROTECTED = ["/dashboard", "/profile"];
 const AUTH_PAGES = ["/login", "/signup"];
 
+/** Strips a /ru prefix so the checks below work for both languages. */
+function withoutLocale(pathname: string): { path: string; prefix: string } {
+  if (pathname === "/ru") return { path: "/", prefix: "/ru" };
+  if (pathname.startsWith("/ru/")) return { path: pathname.slice(3), prefix: "/ru" };
+  return { path: pathname, prefix: "" };
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -34,17 +41,19 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  // A Russian visitor who is redirected should land on the Russian page.
+  const { path, prefix } = withoutLocale(pathname);
 
-  if (!user && PROTECTED.some((path) => pathname.startsWith(path))) {
+  if (!user && PROTECTED.some((entry) => path.startsWith(entry))) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = `${prefix}/login`;
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  if (user && AUTH_PAGES.some((path) => pathname.startsWith(path))) {
+  if (user && AUTH_PAGES.some((entry) => path.startsWith(entry))) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = `${prefix}/dashboard`;
     url.search = "";
     return NextResponse.redirect(url);
   }
