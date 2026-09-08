@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { dictionaries, type Dictionary, type Language } from "@/lib/i18n/dictionaries";
+import { stripLocale } from "@/lib/i18n/locale";
 
 const STORAGE_KEY = "orzix.language";
 
@@ -44,11 +46,19 @@ export function LanguageProvider({
   // afterwards meant the page painted in English and then re-rendered in
   // Russian, and because Russian runs longer the whole layout resettled —
   // which looked like the page shaking on every navigation.
-  const [language, setLanguageState] = useState<Language>(locale ?? readLanguage);
+  // The header and footer live in the root layout, above the /ru layout, so a
+  // prop cannot reach them. Reading the locale from the pathname keeps the
+  // whole page in one language — the URL is the single source of truth.
+  const pathname = usePathname() || "/";
+  const fromUrl = stripLocale(pathname).locale;
+  const resolved = locale ?? (pathname.startsWith("/ru") ? fromUrl : null);
+
+  const [language, setLanguageState] = useState<Language>(resolved ?? readLanguage);
 
   useEffect(() => {
-    if (locale && locale !== language) setLanguageState(locale);
-  }, [locale, language]);
+    const target = resolved ?? readLanguage();
+    if (target !== language) setLanguageState(target);
+  }, [resolved, language]);
 
   useEffect(() => {
     document.documentElement.lang = language;
