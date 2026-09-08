@@ -21,6 +21,66 @@ export type ToolContent = {
 };
 
 const en: Record<string, ToolContent> = {
+  "split-pdf": {
+    intro: [
+      "Splitting is what you need when a document contains more than you want to send. A 200-page report where the recipient only needs chapter four, or a scanned bundle where each contract should become its own file.",
+      "There are three ways to do it here, and they suit different situations. Extracting selected pages puts everything you pick into one new document. Splitting every page produces one file per page, delivered as a ZIP. Splitting by ranges gives you one file per range, so 1-3, 4-8 becomes two documents.",
+      "Page thumbnails are rendered so you can see what you are selecting rather than guessing at page numbers.",
+    ],
+    stepsHeading: "How to split a PDF",
+    steps: [
+      { title: "Upload the document", body: "Drag it onto the page. Thumbnails appear as each page is rendered, which takes a moment for long documents." },
+      { title: "Choose how to split", body: "Pick pages visually, split every page, or type ranges such as 1-3, 4-8." },
+      { title: "Download", body: "A single result downloads as a PDF; several results are packaged into a ZIP." },
+    ],
+    faqHeading: "Questions about splitting PDFs",
+    faq: [
+      { q: "Can I extract just one page?", a: "Yes. Select that page and it becomes a single-page PDF." },
+      { q: "What happens to the original?", a: "Nothing. It stays on your device untouched; splitting produces new files." },
+      { q: "Why do several files come as a ZIP?", a: "Browsers cannot start many downloads at once reliably, so multiple results are packaged into one archive." },
+      { q: "Is there a page limit?", a: "No fixed limit, though rendering thumbnails for a very long document takes time and memory." },
+    ],
+  },
+  "pdf-to-word": {
+    intro: [
+      "Converting a PDF into an editable Word document is the most requested PDF task and the hardest to do well. A PDF stores glyph positions, not paragraphs — the file knows where each character sits, but not that a run of them forms a sentence.",
+      "Reconstructing the document means inferring paragraphs, columns, tables and headings from geometry. Good converters get most of it right on clean, text-based documents. Nothing gets it right every time.",
+      "This conversion runs on a server, because the layout analysis needs more than a browser tab can do. Your file is processed and deleted immediately afterwards.",
+    ],
+    stepsHeading: "How to convert PDF to Word",
+    steps: [
+      { title: "Upload your PDF", body: "Text-based PDFs convert best. A scanned document needs OCR first, since there is no text to recover." },
+      { title: "Wait for processing", body: "Conversion takes a few seconds for short documents and longer for complex layouts." },
+      { title: "Download the .docx", body: "Open it in Word or any compatible editor and check the result before relying on it." },
+    ],
+    faqHeading: "Questions about PDF to Word",
+    faq: [
+      { q: "Will the layout be identical?", a: "Rarely. Simple documents convert closely; multi-column layouts, complex tables and unusual fonts shift. Always check the result." },
+      { q: "Why did my scanned PDF produce an empty document?", a: "A scan contains images of text, not text. Run OCR on it first, then convert." },
+      { q: "Is my document stored?", a: "No. It is written to a temporary directory, converted, returned to you and deleted — including if the conversion fails." },
+      { q: "Can I convert back afterwards?", a: "Word to PDF is a separate tool and works reliably, since going that direction is a rendering job rather than a reconstruction." },
+    ],
+  },
+  "pdf-to-jpg": {
+    intro: [
+      "Turning PDF pages into images is useful when something needs to go somewhere a PDF cannot: a slide, a web page, a message, or a printer that mishandles the original.",
+      "Each page is rendered and saved as a separate JPG. You choose the resolution, from screen size up to print quality, and the result downloads as individual images or a ZIP.",
+      "Rendering happens in your browser using PDF.js, so the document never leaves your device.",
+    ],
+    stepsHeading: "How to convert PDF to JPG",
+    steps: [
+      { title: "Upload the PDF", body: "Any PDF works. Long documents take longer, since every page is rendered individually." },
+      { title: "Choose a resolution", body: "Screen for web use, Print when the images will be printed. Higher settings produce larger files." },
+      { title: "Download", body: "One page downloads as a single image; several pages are packaged as a ZIP." },
+    ],
+    faqHeading: "Questions about PDF to JPG",
+    faq: [
+      { q: "Which resolution should I choose?", a: "Standard at 144 dpi suits most uses. Choose Print at 288 dpi only when the image will be printed, since files get large quickly." },
+      { q: "Can I convert only some pages?", a: "This tool exports every page. To convert a few, extract them first with Split PDF, then convert the result." },
+      { q: "Why are the images large?", a: "JPG stores every pixel, while a PDF often stores text as instructions. A text page becomes a much larger file as an image." },
+      { q: "Can I get PNG instead?", a: "Not from this tool. PNG suits screenshots and graphics; for scanned or photographic pages JPG is smaller at the same visible quality." },
+    ],
+  },
   "merge-pdf": {
     intro: [
       "Combining files is the most common thing anyone needs to do with a PDF. A contract arrives in three parts, a scanner produces one file per page, or a report needs its appendix attached before it goes out.",
@@ -106,6 +166,66 @@ const en: Record<string, ToolContent> = {
 };
 
 const ru: Record<string, ToolContent> = {
+  "split-pdf": {
+    intro: [
+      "Разделение нужно, когда в документе больше, чем требуется отправить. Отчёт на 200 страниц, из которого адресату нужна только четвёртая глава, или пачка сканов, где каждый договор должен стать отдельным файлом.",
+      "Здесь три способа, и они подходят для разных задач. Извлечение выбранных страниц собирает всё отмеченное в один новый документ. Разделение по страницам создаёт отдельный файл для каждой страницы и отдаёт их архивом. Разделение по диапазонам даёт по файлу на диапазон: 1-3, 4-8 превращаются в два документа.",
+      "Миниатюры страниц отображаются сразу, поэтому видно, что именно вы выбираете, и не нужно угадывать номера.",
+    ],
+    stepsHeading: "Как разделить PDF",
+    steps: [
+      { title: "Загрузите документ", body: "Перетащите файл на страницу. Миниатюры появляются по мере отрисовки — для длинных документов это занимает время." },
+      { title: "Выберите способ", body: "Отметьте страницы визуально, разделите по одной или введите диапазоны вида 1-3, 4-8." },
+      { title: "Скачайте результат", body: "Один файл скачивается как PDF, несколько — упаковываются в ZIP-архив." },
+    ],
+    faqHeading: "Вопросы о разделении PDF",
+    faq: [
+      { q: "Можно ли извлечь одну страницу?", a: "Да. Отметьте нужную страницу — получится PDF из одной страницы." },
+      { q: "Что происходит с исходным файлом?", a: "Ничего. Он остаётся на вашем устройстве без изменений, а разделение создаёт новые файлы." },
+      { q: "Почему несколько файлов приходят архивом?", a: "Браузеры плохо справляются с несколькими одновременными загрузками, поэтому результаты упаковываются в один архив." },
+      { q: "Есть ли ограничение по количеству страниц?", a: "Жёсткого ограничения нет, но отрисовка миниатюр очень длинного документа требует времени и памяти." },
+    ],
+  },
+  "pdf-to-word": {
+    intro: [
+      "Преобразование PDF в редактируемый документ Word — самая востребованная и самая сложная задача. PDF хранит положение символов, а не абзацы: файл знает, где стоит каждая буква, но не знает, что вместе они образуют предложение.",
+      "Восстановление документа означает, что абзацы, колонки, таблицы и заголовки приходится выводить из геометрии. Хорошие конвертеры справляются с чистыми текстовыми документами. Идеально не справляется ни один.",
+      "Это преобразование выполняется на сервере, потому что анализ разметки выходит за пределы возможностей браузера. Ваш файл обрабатывается и сразу удаляется.",
+    ],
+    stepsHeading: "Как преобразовать PDF в Word",
+    steps: [
+      { title: "Загрузите PDF", body: "Лучше всего конвертируются текстовые PDF. Скан требует предварительного распознавания — восстанавливать там нечего." },
+      { title: "Дождитесь обработки", body: "Короткие документы обрабатываются за несколько секунд, сложная вёрстка — дольше." },
+      { title: "Скачайте .docx", body: "Откройте файл в Word или совместимом редакторе и проверьте результат, прежде чем на него полагаться." },
+    ],
+    faqHeading: "Вопросы о преобразовании PDF в Word",
+    faq: [
+      { q: "Будет ли разметка такой же?", a: "Редко. Простые документы получаются близкими к оригиналу; многоколоночная вёрстка, сложные таблицы и необычные шрифты смещаются. Результат стоит проверять." },
+      { q: "Почему из скана получился пустой документ?", a: "Скан содержит изображение текста, а не текст. Сначала распознайте его с помощью OCR, затем конвертируйте." },
+      { q: "Хранится ли мой документ?", a: "Нет. Он записывается во временную папку, преобразуется, возвращается вам и удаляется — в том числе при ошибке." },
+      { q: "Можно ли преобразовать обратно?", a: "Word в PDF — отдельный инструмент, и он работает надёжно: в эту сторону это отрисовка, а не восстановление структуры." },
+    ],
+  },
+  "pdf-to-jpg": {
+    intro: [
+      "Преобразование страниц PDF в изображения нужно, когда документ должен попасть туда, куда PDF не помещается: в презентацию, на веб-страницу, в сообщение или в принтер, который неправильно печатает оригинал.",
+      "Каждая страница отрисовывается и сохраняется отдельным файлом JPG. Разрешение выбираете вы — от экранного до печатного, — а результат скачивается отдельными изображениями или архивом.",
+      "Отрисовка выполняется в браузере с помощью PDF.js, поэтому документ не покидает ваше устройство.",
+    ],
+    stepsHeading: "Как преобразовать PDF в JPG",
+    steps: [
+      { title: "Загрузите PDF", body: "Подойдёт любой файл. Длинные документы обрабатываются дольше, так как каждая страница отрисовывается отдельно." },
+      { title: "Выберите разрешение", body: "«Экран» — для веба, «Печать» — если изображения пойдут на печать. Чем выше настройка, тем больше файлы." },
+      { title: "Скачайте", body: "Одна страница скачивается изображением, несколько — архивом ZIP." },
+    ],
+    faqHeading: "Вопросы о преобразовании PDF в JPG",
+    faq: [
+      { q: "Какое разрешение выбрать?", a: "«Стандартное» (144 dpi) подходит для большинства задач. «Печать» (288 dpi) стоит выбирать только для печати — файлы быстро становятся большими." },
+      { q: "Можно ли преобразовать только часть страниц?", a: "Этот инструмент экспортирует все страницы. Чтобы взять несколько, сначала извлеките их через «Разделить PDF», затем преобразуйте результат." },
+      { q: "Почему изображения такие большие?", a: "JPG хранит каждый пиксель, тогда как PDF часто хранит текст в виде инструкций. Текстовая страница в виде картинки весит заметно больше." },
+      { q: "Можно ли получить PNG?", a: "В этом инструменте — нет. PNG подходит для скриншотов и графики, а для сканов и фотографий JPG меньше при том же видимом качестве." },
+    ],
+  },
   "merge-pdf": {
     intro: [
       "Объединение файлов — самая частая задача, которая возникает с PDF. Договор приходит в трёх частях, сканер сохраняет каждую страницу отдельным файлом, к отчёту нужно приложить приложение перед отправкой.",
