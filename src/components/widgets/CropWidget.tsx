@@ -14,6 +14,7 @@ import { WidgetStack } from "@/components/widgets/WidgetShell";
 import { useSinglePdf } from "@/components/widgets/useSinglePdf";
 import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
+import { imageFormatOf, pdfBackToImage } from "@/lib/pdf/export";
 import { cropPdf, FULL_PAGE, type CropRect, type OutputPageSize } from "@/lib/pdf/crop";
 import { openDocument, renderPage } from "@/lib/pdf/render";
 import { formatBytes, withSuffix } from "@/lib/utils";
@@ -192,12 +193,25 @@ export function CropWidget() {
     clear();
   }
 
+  // An upload that arrived as an image should leave as one, rather than as
+  // the PDF the tool used internally.
+  const imageFormat = imageFormatOf(pdf?.convertedFrom);
+
+  async function downloadResult(bytes: Uint8Array, pdfName: string) {
+    if (imageFormat && pdf) {
+      const image = await pdfBackToImage(bytes, pdf.file.name, imageFormat);
+      downloadBlob(image.blob, image.fileName);
+      return;
+    }
+    downloadBlob(toBlob(bytes), pdfName);
+  }
+
   if (result && pdf) {
     const fileName = withSuffix(pdf.displayName, "cropped");
     return (
       <DownloadResult
         title="Your cropped PDF is ready"
-        fileName={fileName}
+        fileName={imageFormat ? fileName.replace(/\.pdf$/, `.${imageFormat}`) : fileName}
         stats={[
           { label: "Pages cropped", value: allPages ? String(pdf.pageCount) : "1" },
           {
@@ -211,9 +225,9 @@ export function CropWidget() {
             ? "Cropping hides the margins rather than deleting the content, so the page can be widened again later."
             : "The cropped area was scaled to fit a printable sheet, centred with a small margin."
         }
-        downloadLabel="Download cropped PDF"
+        downloadLabel={imageFormat ? `Download cropped ${imageFormat.toUpperCase()}` : "Download cropped PDF"}
         restartLabel="Crop another PDF"
-        onDownload={() => downloadBlob(toBlob(result), fileName)}
+        onDownload={() => downloadResult(result, fileName)}
         onRestart={reset}
         onDelete={reset}
       />

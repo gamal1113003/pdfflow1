@@ -14,6 +14,7 @@ import { WidgetStack } from "@/components/widgets/WidgetShell";
 import { useSinglePdf } from "@/components/widgets/useSinglePdf";
 import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
+import { imageFormatOf, pdfBackToImage } from "@/lib/pdf/export";
 import { applyPagePlan, planFromPageCount, type PagePlan } from "@/lib/pdf/organize";
 import type { Tool } from "@/lib/tools";
 import { formatBytes, moveItem, uid, withSuffix } from "@/lib/utils";
@@ -165,11 +166,24 @@ export function OrganizeWidget({ tool }: { tool: Tool }) {
     clear();
   }
 
+  // An upload that arrived as an image should leave as one, rather than as
+  // the PDF the tool used internally.
+  const imageFormat = imageFormatOf(pdf?.convertedFrom);
+
+  async function downloadResult(bytes: Uint8Array, pdfName: string) {
+    if (imageFormat && pdf) {
+      const image = await pdfBackToImage(bytes, pdf.file.name, imageFormat);
+      downloadBlob(image.blob, image.fileName);
+      return;
+    }
+    downloadBlob(toBlob(bytes), pdfName);
+  }
+
   if (result && pdf) {
     const fileName = withSuffix(pdf.displayName, copy.suffix);
     return (
       <DownloadResult
-        fileName={fileName}
+        fileName={imageFormat ? fileName.replace(/\.pdf$/, `.${imageFormat}`) : fileName}
         stats={[
           { label: "Pages before", value: String(pdf.pageCount) },
           {
@@ -184,7 +198,7 @@ export function OrganizeWidget({ tool }: { tool: Tool }) {
           },
           { label: "Size", value: formatBytes(result.byteLength) },
         ]}
-        onDownload={() => downloadBlob(toBlob(result), fileName)}
+        onDownload={() => downloadResult(result, fileName)}
         onRestart={reset}
         onDelete={reset}
       />

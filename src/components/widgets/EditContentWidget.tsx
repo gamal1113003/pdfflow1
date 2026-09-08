@@ -14,6 +14,7 @@ import { WidgetStack } from "@/components/widgets/WidgetShell";
 import { useSinglePdf } from "@/components/widgets/useSinglePdf";
 import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
+import { imageFormatOf, pdfBackToImage } from "@/lib/pdf/export";
 import { applyAnnotations, TEXT_FONT_STACK, type Annotation, type Point } from "@/lib/pdf/annotate";
 import { openDocument, renderPage } from "@/lib/pdf/render";
 import { formatBytes, uid, withSuffix } from "@/lib/utils";
@@ -295,12 +296,25 @@ export function EditContentWidget() {
     clear();
   }
 
+  // An upload that arrived as an image should leave as one, rather than as
+  // the PDF the tool used internally.
+  const imageFormat = imageFormatOf(pdf?.convertedFrom);
+
+  async function downloadResult(bytes: Uint8Array, pdfName: string) {
+    if (imageFormat && pdf) {
+      const image = await pdfBackToImage(bytes, pdf.file.name, imageFormat);
+      downloadBlob(image.blob, image.fileName);
+      return;
+    }
+    downloadBlob(toBlob(bytes), pdfName);
+  }
+
   if (result && pdf) {
     const fileName = withSuffix(pdf.displayName, "edited");
     return (
       <DownloadResult
         title="Your edited PDF is ready"
-        fileName={fileName}
+        fileName={imageFormat ? fileName.replace(/\.pdf$/, `.${imageFormat}`) : fileName}
         stats={[
           { label: "Edits added", value: String(annotations.length) },
           { label: "Pages", value: String(pdf.pageCount) },
@@ -311,9 +325,9 @@ export function EditContentWidget() {
             ? "Pages were flattened to images, so anything under a black-out is gone and text is no longer selectable."
             : "Your edits sit on top of the original page, which keeps the text selectable underneath."
         }
-        downloadLabel="Download edited PDF"
+        downloadLabel={imageFormat ? `Download edited ${imageFormat.toUpperCase()}` : "Download edited PDF"}
         restartLabel="Edit another PDF"
-        onDownload={() => downloadBlob(toBlob(result), fileName)}
+        onDownload={() => downloadResult(result, fileName)}
         onRestart={reset}
         onDelete={reset}
       />

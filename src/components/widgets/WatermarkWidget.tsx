@@ -15,6 +15,7 @@ import { SettingsPanel, WidgetStack } from "@/components/widgets/WidgetShell";
 import { useSinglePdf } from "@/components/widgets/useSinglePdf";
 import { toBlob } from "@/lib/pdf/document";
 import { downloadBlob } from "@/lib/pdf/download";
+import { imageFormatOf, pdfBackToImage } from "@/lib/pdf/export";
 import { watermarkPdf, type WatermarkPosition } from "@/lib/pdf/watermark";
 import { formatBytes, withSuffix } from "@/lib/utils";
 import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
@@ -68,18 +69,31 @@ export function WatermarkWidget() {
     clear();
   }
 
+  // An upload that arrived as an image should leave as one, rather than as
+  // the PDF the tool used internally.
+  const imageFormat = imageFormatOf(pdf?.convertedFrom);
+
+  async function downloadResult(bytes: Uint8Array, pdfName: string) {
+    if (imageFormat && pdf) {
+      const image = await pdfBackToImage(bytes, pdf.file.name, imageFormat);
+      downloadBlob(image.blob, image.fileName);
+      return;
+    }
+    downloadBlob(toBlob(bytes), pdfName);
+  }
+
   if (result && pdf) {
     const fileName = withSuffix(pdf.displayName, "watermarked");
     return (
       <DownloadResult
-        fileName={fileName}
+        fileName={imageFormat ? fileName.replace(/\.pdf$/, `.${imageFormat}`) : fileName}
         stats={[
           { label: "Pages stamped", value: String(pdf.pageCount) },
           { label: "Watermark", value: text },
           { label: "Size", value: formatBytes(result.byteLength) },
         ]}
         restartLabel="Watermark another PDF"
-        onDownload={() => downloadBlob(toBlob(result), fileName)}
+        onDownload={() => downloadResult(result, fileName)}
         onRestart={reset}
         onDelete={reset}
       />
