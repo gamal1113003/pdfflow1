@@ -36,6 +36,23 @@ const OFFICE_JOB: Record<string, ServiceJob> = {
   pptx: "ppt-to-pdf",
 };
 
+export function extensionOf(file: File): string {
+  return (file.name.split(".").pop() ?? "").toLowerCase();
+}
+
+export function needsConversion(file: File): boolean {
+  return extensionOf(file) !== "pdf";
+}
+
+/** Describes what will happen, so the UI can say so before it starts. */
+export function conversionLabel(file: File): string | null {
+  const ext = extensionOf(file);
+  if (ext === "pdf") return null;
+  if (IMAGE_EXTENSIONS.includes(ext)) return "Converting your image to PDF";
+  if (OFFICE_EXTENSIONS.includes(ext)) return "Converting your document to PDF";
+  return null;
+}
+
 async function imageToPdf(file: File): Promise<Uint8Array> {
   const bytes = await readFileBytes(file);
   const doc = await PDFDocument.create();

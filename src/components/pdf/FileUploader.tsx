@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useId, useRef, useState } from "react";
-import { AlertCircle, UploadCloud } from "lucide-react";
+import { AlertCircle, Loader2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MAX_FILE_BYTES, validateFile } from "@/lib/validation";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,9 @@ export type FileUploaderProps = {
   multiple?: boolean;
   maxBytes?: number;
   disabled?: boolean;
+  /** Shows a working state while an upload is being read or converted. */
+  busy?: boolean;
+  busyLabel?: string;
   title?: string;
   hint?: string;
   buttonLabel?: string;
@@ -21,11 +24,22 @@ export type FileUploaderProps = {
   onFiles: (files: File[]) => void;
 };
 
+/** A long extension list is unreadable, so it is summarised. */
+function describeAccepted(extensions: string[], maxBytes: number): string {
+  const size = `up to ${Math.round(maxBytes / 1024 / 1024)} MB`;
+  if (extensions.length > 5) {
+    return `PDF, DOC, XLS, PPT, PNG, JPG · ${size}`;
+  }
+  return `${extensions.map((e) => e.toUpperCase()).join(", ")} · ${size}`;
+}
+
 export function FileUploader({
   extensions = ["pdf"],
   multiple = false,
   maxBytes = MAX_FILE_BYTES,
   disabled = false,
+  busy = false,
+  busyLabel = "Preparing your file…",
   title = "Drop your PDF here",
   hint = "or choose a file from your device",
   buttonLabel = "Choose PDF",
@@ -96,7 +110,14 @@ export function FileUploader({
             dragging && "scale-110",
           )}
         >
-          <UploadCloud className={size === "lg" ? "size-7" : "size-5"} aria-hidden="true" />
+          {busy ? (
+            <Loader2
+              className={cn("animate-spin", size === "lg" ? "size-7" : "size-5")}
+              aria-hidden="true"
+            />
+          ) : (
+            <UploadCloud className={size === "lg" ? "size-7" : "size-5"} aria-hidden="true" />
+          )}
         </span>
 
         <h3
@@ -105,9 +126,11 @@ export function FileUploader({
             size === "lg" ? "text-xl sm:text-2xl" : "text-base",
           )}
         >
-          {title}
+          {busy ? busyLabel : title}
         </h3>
-        <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground">{hint}</p>
+        <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground">
+          {busy ? "Word, Excel and PowerPoint files are converted on the server." : hint}
+        </p>
 
         <Button
           type="button"
@@ -120,8 +143,7 @@ export function FileUploader({
         </Button>
 
         <p className="mt-4 text-xs text-muted-foreground">
-          {note ??
-            `${extensions.map((e) => e.toUpperCase()).join(", ")} · up to ${Math.round(maxBytes / 1024 / 1024)} MB`}
+          {note ?? describeAccepted(extensions, maxBytes)}
         </p>
 
         <label htmlFor={inputId} className="sr-only">
