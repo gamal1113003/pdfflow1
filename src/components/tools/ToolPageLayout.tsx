@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight, ShieldCheck } from "lucide-react";
 import { ToolGrid } from "@/components/tools/ToolGrid";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { ToolContentSection } from "@/components/tools/ToolContentSection";
 import { toolJsonLd } from "@/lib/seo";
 import { getTool, tools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -65,6 +66,8 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
           {tool.runsInBrowser ? t.toolPage.inBrowser : t.toolPage.needsServer}
         </p>
       </div>
+
+      <ToolContentSection slug={slug} language={language} />
 
       {related.length > 0 && (
         <section className="border-t border-border bg-card py-16" aria-labelledby="related-tools">
