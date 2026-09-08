@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { ToolIcon } from "@/components/tools/ToolIcon";
 import type { Tool } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,7 @@ export function ToolCard({ tool, className }: { tool: Tool; className?: string }
 
   return (
     <Link
-      href={`/${tool.slug}`}
+      href={pathFor(language, `/${tool.slug}`)}
       className={cn(
         "group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-subtle transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lifted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,

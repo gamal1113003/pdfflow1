@@ -38,6 +38,14 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: site.url,
+    languages: {
+      en: site.url,
+      ru: `${site.url}/ru`,
+      "x-default": site.url,
+    },
+  },
 };
 
 export const viewport: Viewport = {

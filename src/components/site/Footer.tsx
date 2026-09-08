@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LogoMark } from "@/components/site/Logo";
 import { tools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
 
 const TOOL_LINKS = [
@@ -67,7 +68,7 @@ export function Footer() {
               {column.links.map((link) => (
                 <li key={link.label}>
                   <Link
-                    href={link.href}
+                    href={pathFor(language, link.href)}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {link.label}

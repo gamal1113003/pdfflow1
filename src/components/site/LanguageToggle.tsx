@@ -1,16 +1,24 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Languages } from "lucide-react";
 import { LANGUAGES } from "@/lib/i18n/dictionaries";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { switchLocale } from "@/lib/i18n/locale";
 import { cn } from "@/lib/utils";
 
+/**
+ * Links rather than buttons. Each language now has its own URL, so switching
+ * is a navigation — which also means the choice can be shared and bookmarked,
+ * and a search engine can follow it.
+ */
 export function LanguageToggle({ className }: { className?: string }) {
-  const { language, setLanguage, t } = useLanguage();
+  const pathname = usePathname() || "/";
+  const { language, t } = useLanguage();
 
   return (
-    <div
-      role="radiogroup"
+    <nav
       aria-label={t.nav.language}
       className={cn(
         "inline-flex items-center gap-0.5 rounded-full border border-border bg-card p-1",
@@ -21,23 +29,21 @@ export function LanguageToggle({ className }: { className?: string }) {
       {LANGUAGES.map((entry) => {
         const active = language === entry.code;
         return (
-          <button
+          <Link
             key={entry.code}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={entry.label}
+            href={switchLocale(pathname, entry.code)}
+            hrefLang={entry.code}
+            aria-current={active ? "true" : undefined}
             title={entry.label}
-            onClick={() => setLanguage(entry.code)}
             className={cn(
               "rounded-full px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
               active && "bg-primary-soft text-primary",
             )}
           >
             {entry.short}
-          </button>
+          </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

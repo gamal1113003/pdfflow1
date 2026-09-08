@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { popularTools, tools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +66,7 @@ export function Header() {
                 <div className="grid grid-cols-2 gap-0.5">
                   {popularTools.slice(0, 8).map((tool) => (
                     <DropdownMenuItem key={tool.slug} asChild>
-                      <Link href={`/${tool.slug}`}>
+                      <Link href={pathFor(language, `/${tool.slug}`)}>
                         <ToolIcon name={tool.icon} className="size-4 text-primary" />
                         <span className="truncate">{translateTool(language, tool.slug, tool).name}</span>
                       </Link>
@@ -74,7 +75,7 @@ export function Header() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/tools" className="font-medium text-primary">
+                  <Link href={pathFor(language, "/tools")} className="font-medium text-primary">
                     {t.nav.browseAll}
                   </Link>
                 </DropdownMenuItem>
@@ -84,7 +85,7 @@ export function Header() {
             {NAV.map((item) => (
               <Link
                 key={item.key}
-                href={item.href}
+                href={pathFor(language, item.href)}
                 className={cn(
                   "inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                   pathname === item.href && "text-foreground",
@@ -156,7 +157,7 @@ export function Header() {
               {popularTools.map((tool) => (
                 <Link
                   key={tool.slug}
-                  href={`/${tool.slug}`}
+                  href={pathFor(language, `/${tool.slug}`)}
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-3.5"
                 >
                   <span className="grid size-9 place-items-center rounded-lg bg-primary-soft text-primary">
@@ -168,11 +169,11 @@ export function Header() {
             </div>
 
             <nav aria-label="Sections" className="grid gap-1 border-t border-border pt-6">
-              <Link href="/tools" className="py-2.5 text-[1.05rem] font-medium">
+              <Link href={pathFor(language, "/tools")} className="py-2.5 text-[1.05rem] font-medium">
                 {t.nav.browseAll}
               </Link>
               {NAV.map((item) => (
-                <Link key={item.key} href={item.href} className="py-2.5 text-[1.05rem] font-medium">
+                <Link key={item.key} href={pathFor(language, item.href)} className="py-2.5 text-[1.05rem] font-medium">
                   {t.nav[item.key]}
                 </Link>
               ))}
