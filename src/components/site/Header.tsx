@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageToggle } from "@/components/site/LanguageToggle";
@@ -17,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { popularTools, tools } from "@/lib/tools";
+import { popularTools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
@@ -33,19 +32,6 @@ const NAV = [
 export function Header() {
   const pathname = usePathname();
   const { language, t } = useLanguage();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between gap-6">
@@ -108,83 +94,18 @@ export function Header() {
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
-          <Button asChild size="sm" variant="secondary">
-            <Link href={pathFor(language, "/login")}>Log in</Link>
+        {/* No slide-out panel on small screens: the controls that matter fit
+            in the bar itself, and a menu that has to open is one more thing to
+            go wrong. Everything else is reachable from the tools page. */}
+        <div className="flex items-center gap-1.5 lg:hidden">
+          <LanguageToggle />
+          <ThemeToggle />
+          <Button asChild size="sm">
+            <Link href={pathFor(language, "/tools")}>{t.nav.tools}</Link>
           </Button>
-
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            className="grid size-10 shrink-0 place-items-center rounded-xl border border-border text-foreground"
-          >
-            <span className="sr-only">{open ? t.nav.closeMenu : t.nav.openMenu}</span>
-            {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
-          </button>
         </div>
       </div>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-background lg:hidden"
-        >
-          <div className="container space-y-6 py-6">
-            <div className="grid grid-cols-2 gap-2">
-              <Button asChild variant="secondary" size="lg">
-                <Link href={pathFor(language, "/login")}>Log in</Link>
-              </Button>
-              <Button asChild size="lg">
-                <Link href={pathFor(language, "/signup")}>{t.nav.getStarted}</Link>
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="grid size-10 shrink-0 place-items-center rounded-xl border border-border"
-              >
-                <span className="sr-only">{t.nav.closeMenu}</span>
-                <X className="size-5" aria-hidden />
-              </button>
-            </div>
-
-            <div className="grid gap-2">
-              {popularTools.map((tool) => (
-                <Link
-                  key={tool.slug}
-                  href={pathFor(language, `/${tool.slug}`)}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3.5"
-                >
-                  <span className="grid size-9 place-items-center rounded-lg bg-primary-soft text-primary">
-                    <ToolIcon name={tool.icon} className="size-4" />
-                  </span>
-                  <span className="text-[0.95rem] font-medium">{translateTool(language, tool.slug, tool).name}</span>
-                </Link>
-              ))}
-            </div>
-
-            <nav aria-label="Sections" className="grid gap-1 border-t border-border pt-6">
-              <Link href={pathFor(language, "/tools")} className="py-2.5 text-[1.05rem] font-medium">
-                {t.nav.browseAll}
-              </Link>
-              {NAV.map((item) => (
-                <Link key={item.key} href={pathFor(language, item.href)} className="py-2.5 text-[1.05rem] font-medium">
-                  {t.nav[item.key]}
-                </Link>
-              ))}
-            </nav>
-
-          </div>
-        </div>
-      )}
     </header>
   );
 }
