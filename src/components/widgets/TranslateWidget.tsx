@@ -18,7 +18,7 @@ import { buildTranslatedPdf, extractPageText, translatePages } from "@/lib/pdf/t
 import { TRANSLATE_LANGUAGES } from "@/lib/services/translationService";
 import { runServiceJob, ServiceUnavailableError } from "@/lib/services/pdfService";
 import { formatBytes, withSuffix } from "@/lib/utils";
-import { ACCEPTED_INPUT } from "@/lib/pdf/ingest";
+import { DOCUMENT_INPUT } from "@/lib/pdf/ingest";
 
 export function TranslateWidget() {
   const { pdf, loading, error, setError, load, clear } = useSinglePdf();
@@ -133,7 +133,7 @@ export function TranslateWidget() {
   return (
     <WidgetStack>
       {!pdf ? (
-        <FileUploader extensions={ACCEPTED_INPUT} disabled={loading} busy={loading} onFiles={load} />
+        <FileUploader extensions={DOCUMENT_INPUT} disabled={loading} busy={loading} onFiles={load} />
       ) : (
         <>
           <FileSummary

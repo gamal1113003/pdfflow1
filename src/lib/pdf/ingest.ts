@@ -27,6 +27,12 @@ export const OFFICE_EXTENSIONS = ["doc", "docx", "xls", "xlsx", "ppt", "pptx"];
 /** Everything a PDF tool will now take. */
 export const ACCEPTED_INPUT = ["pdf", ...OFFICE_EXTENSIONS, ...IMAGE_EXTENSIONS];
 
+/**
+ * Tools that need words on the page, not pixels. Translation reads the text
+ * layer, and a photo has none — so images are not offered there.
+ */
+export const DOCUMENT_INPUT = ["pdf", ...OFFICE_EXTENSIONS];
+
 const OFFICE_JOB: Record<string, ServiceJob> = {
   doc: "word-to-pdf",
   docx: "word-to-pdf",
