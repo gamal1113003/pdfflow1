@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { ToolCard } from "@/components/tools/ToolCard";
 import { searchTools, type ToolCategory } from "@/lib/tools";
@@ -8,8 +9,21 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { fill } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
+const VALID_CATEGORIES = new Set([
+  "convert-from-pdf",
+  "convert-to-pdf",
+  "compress",
+  "organize",
+  "edit",
+  "security",
+  "image",
+]);
+
 export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: ToolCategory | "all" }) {
   const [category, setCategory] = useState<ToolCategory | "all">(initialCategory);
+  // Read on the client rather than the server, so the page can be exported as
+  // static HTML and still respond to /tools?category=organize.
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const { t } = useLanguage();
 
@@ -18,8 +32,10 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
   // not remounted and the initial state would otherwise stick on whichever
   // category was opened first.
   useEffect(() => {
-    setCategory(initialCategory);
-  }, [initialCategory]);
+    const requested = searchParams.get("category");
+    const valid = requested && VALID_CATEGORIES.has(requested);
+    setCategory(valid ? (requested as ToolCategory) : initialCategory);
+  }, [searchParams, initialCategory]);
 
   const results = useMemo(() => searchTools(query, category), [query, category]);
 
@@ -93,13 +109,17 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
         </div>
       </div>
 
-      <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
+      <p className="mt-6 min-h-5 text-sm text-muted-foreground" aria-live="polite">
         {fill(results.length === 1 ? t.toolsPage.resultOne : t.toolsPage.resultMany, {
           count: results.length,
         })}
         {query && ` — ${t.toolsPage.matching} “${query}”`}
       </p>
 
+      {/* A minimum height stops the page jumping as the grid renders: without
+          it the document is short for a moment and then abruptly tall, which
+          shifts the scroll position. */}
+      <div className="min-h-[70vh]">
       {results.length > 0 ? (
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((tool) => (
@@ -124,6 +144,7 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }

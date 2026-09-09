@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ToolsExplorer } from "@/components/tools/ToolsExplorer";
 import { ToolsHeading } from "@/components/tools/ToolsHeading";
 import { pageMetadata } from "@/lib/seo";
@@ -35,7 +36,10 @@ export default async function ToolsPage({
       <ToolsHeading count={tools.length} />
 
       <div className="mt-12">
-        <ToolsExplorer initialCategory={initialCategory} />
+        {/* useSearchParams needs a boundary so the shell can render first. */}
+        <Suspense fallback={<div className="min-h-[70vh]" />}>
+          <ToolsExplorer initialCategory={initialCategory} />
+        </Suspense>
       </div>
     </div>
   );

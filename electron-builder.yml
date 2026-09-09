@@ -1,0 +1,31 @@
+appId: app.orzix.desktop
+productName: orzix
+copyright: © 2026 orzix
+
+directories:
+  output: desktop/dist
+  buildResources: desktop
+
+files:
+  - desktop/main.js
+  - desktop/app/**/*
+  - package.json
+
+win:
+  target: nsis
+  icon: desktop/icon.png
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+
+mac:
+  target: dmg
+  category: public.app-category.productivity
+  icon: desktop/icon.png
+
+linux:
+  target: AppImage
+  category: Office
+  icon: desktop/icon.png

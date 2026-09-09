@@ -5,3 +5,8 @@ out
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# desktop build artefacts
+.desktop-build
+desktop/app
+desktop/dist
