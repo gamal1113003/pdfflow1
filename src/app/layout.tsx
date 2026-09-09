@@ -7,6 +7,7 @@ import { PendingFileProvider } from "@/components/pdf/PendingFileProvider";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { site } from "@/lib/site";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
