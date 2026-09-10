@@ -16,6 +16,17 @@ const { capabilities } = require("./native/index.js");
 
 const REMOTE = process.env.ORZIX_API_URL || "";
 
+/**
+ * Tesseract reads images, not PDFs — "Pdf reading is not supported" is its own
+ * error message. On a server, ocrmypdf rasterises the pages first. Here the
+ * page already has PDF.js, so the renderer does that step and sends one image
+ * at a time; this job turns each into a single-page searchable PDF, and the
+ * page stitches them back together with pdf-lib.
+ */
+const PAGE_JOBS = {
+  "ocr-page": { ext: "pdf", type: "application/pdf" },
+};
+
 const OUTPUT = {
   "pdf-to-word": { ext: "docx", type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
   "pdf-to-excel": { ext: "xlsx", type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
@@ -58,6 +69,8 @@ function readUpload(request) {
 
 async function runLocally(job, buffer, fileName, fields) {
   switch (job) {
+    case "ocr-page":
+      return jobs.ocrImage(buffer, fields.language || "eng");
     case "word-to-pdf":
     case "excel-to-pdf":
     case "ppt-to-pdf":
@@ -97,7 +110,8 @@ async function forward(job, buffer, fileName, fields) {
 }
 
 async function handle(request, response, job) {
-  if (!OUTPUT[job]) {
+  const spec = OUTPUT[job] ?? PAGE_JOBS[job];
+  if (!spec) {
     response.writeHead(404, { "Content-Type": "application/json" });
     response.end(JSON.stringify({ error: "Unknown conversion." }));
     return;
@@ -130,7 +144,7 @@ async function handle(request, response, job) {
       }
     }
 
-    const { ext, type } = OUTPUT[job];
+    const { ext, type } = spec;
     const base = fileName.replace(/\.[^.]+$/, "") || "document";
     response.writeHead(200, {
       "Content-Type": type,

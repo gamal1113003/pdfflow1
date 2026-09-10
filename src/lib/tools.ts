@@ -26,6 +26,8 @@ export type ToolWidget =
   | "crop"
   | "edit-content"
   | "translate"
+  | "ocr-local"
+  | "compare"
   | "backend";
 
 export type Tool = {
@@ -383,6 +385,22 @@ export const tools: Tool[] = [
     },
   },
   {
+    slug: "compare-pdf",
+    name: "Compare PDFs",
+    description: "Find what changed between two versions of a document.",
+    lede: "Put two versions side by side and see exactly what changed.",
+    categories: ["edit", "organize"],
+    icon: "Columns2",
+    widget: "compare",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Compare PDF Files Online — Find the Differences | orzix",
+      description:
+        "Compare two PDFs and see what changed. Visual comparison marks every difference on the page; word comparison shows exactly which text was added or removed.",
+    },
+  },
+  {
     slug: "watermark-pdf",
     name: "Watermark PDF",
     description: "Add custom text or image watermarks.",
@@ -472,7 +490,7 @@ export const tools: Tool[] = [
     icon: "ScanText",
     widget: "backend",
     runsInBrowser: false,
-    config: { accept: ["pdf","doc","txt"], outputLabel: "Searchable PDF" },
+    config: { accept: ["pdf"], outputLabel: "Searchable PDF" },
     seo: {
       title: "OCR PDF Online — Make Scans Searchable | orzix",
       description:

@@ -16,6 +16,11 @@ import path from "node:path";
 
 const run = promisify(execFile);
 const root = process.cwd();
+
+/** Matches the folder layout used by desktop/native. */
+function platformDir() {
+  return `${process.platform}-${process.arch}`;
+}
 const work = path.join(root, ".desktop-build");
 
 /**
@@ -117,6 +122,15 @@ export function TrackToolUsage(_props: { slug: string }) {
 
   const registryPath = path.join(work, "src/lib/tools.ts");
   let registry = await readFile(registryPath, "utf8");
+
+  // OCR is done differently here: the page rasterises with PDF.js and the
+  // application runs Tesseract on each image. Tesseract cannot read a PDF at
+  // all, so the shared backend widget would fail on the first page.
+  registry = registry.replace(
+    /(slug: "ocr-pdf",[\s\S]*?)widget: "backend"/,
+    '$1widget: "ocr-local"',
+  );
+
   registry = registry.replace(
     "export const toolBySlug",
     `// Translation needs an API route the desktop build does not have.
@@ -244,21 +258,43 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
     path.join(aboutDir, "page.tsx"),
   );
 
-  // On the website every tool needs the internet, so saying so is noise. In
-  // the desktop app it is the useful distinction: some tools work with the
-  // network off and some do not, and it is not obvious which.
-  const layoutToolPath = path.join(work, "src/components/tools/ToolPageLayout.tsx");
-  let layoutTool = await readFile(layoutToolPath, "utf8");
-  layoutTool = layoutTool
-    .replace(
-      'import { ChevronRight, ShieldCheck } from "lucide-react";',
-      'import { ChevronRight } from "lucide-react";\nimport { ConnectionNotice } from "@/components/tools/ConnectionNotice";',
-    )
-    .replace(
-      /<p className="mx-auto mt-8 flex max-w-4xl[\s\S]*?<\/p>/,
-      '<div className="mx-auto mt-8 max-w-4xl">\n          <ConnectionNotice runsInBrowser={tool.runsInBrowser} />\n        </div>',
-    );
-  await writeFile(layoutToolPath, layoutTool);
+  // No panel. The website's single line is kept, but made accurate: a tool
+  // whose program was bundled really does run on this device, so it is marked
+  // as local in the registry. Checked against the files on disk at build time,
+  // which is when it is known.
+  const bundled = {
+    qpdf: await exists(path.join(root, `desktop/native/${platformDir()}/qpdf`)),
+    tesseract: await exists(path.join(root, `desktop/native/${platformDir()}/tesseract`)),
+    libreoffice: await exists(path.join(root, `desktop/native/${platformDir()}/libreoffice`)),
+  };
+
+  const LOCAL_WHEN = {
+    "ocr-pdf": "tesseract",
+    "protect-pdf": "qpdf",
+    "unlock-pdf": "qpdf",
+    "pdf-to-word": "libreoffice",
+    "pdf-to-excel": "libreoffice",
+    "pdf-to-ppt": "libreoffice",
+    "word-to-pdf": "libreoffice",
+    "excel-to-pdf": "libreoffice",
+    "ppt-to-pdf": "libreoffice",
+  };
+
+  const nowLocal = Object.entries(LOCAL_WHEN)
+    .filter(([, program]) => bundled[program])
+    .map(([slug]) => slug);
+
+  if (nowLocal.length > 0) {
+    registry = await readFile(registryPath, "utf8");
+    for (const slug of nowLocal) {
+      registry = registry.replace(
+        new RegExp(`(slug: "${slug}",[\\s\\S]*?)runsInBrowser: false`),
+        "$1runsInBrowser: true",
+      );
+    }
+    await writeFile(registryPath, registry);
+    console.log(`  Marked as local: ${nowLocal.join(", ")}`);
+  }
 
   // The header links to pages that no longer exist.
   const headerPath = path.join(work, "src/components/site/Header.tsx");

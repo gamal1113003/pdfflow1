@@ -2,6 +2,7 @@
 
 import {
   ArrowLeftRight,
+  Columns2,
   Combine,
   Crop,
   Droplets,
@@ -32,6 +33,7 @@ import {
 
 const ICONS: Record<string, LucideIcon> = {
   ArrowLeftRight,
+  Columns2,
   Combine,
   Crop,
   Droplets,

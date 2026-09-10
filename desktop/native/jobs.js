@@ -160,7 +160,35 @@ async function ocrPdf(inputBuffer, language = "eng") {
   });
 }
 
+/**
+ * OCR on a single rasterised page. Tesseract writes a searchable PDF: the
+ * image on top, the recognised text invisible behind it, so the page looks
+ * identical but can be searched and copied.
+ */
+async function ocrImage(imageBuffer, language = "eng") {
+  const tesseract = locate("tesseract");
+  if (!tesseract) throw new MissingToolError("Tesseract");
+
+  return withWorkspace(async (dir) => {
+    const input = path.join(dir, "page.png");
+    const stem = path.join(dir, "page");
+    await fs.writeFile(input, imageBuffer);
+
+    await run(tesseract, [input, stem, "-l", language, "pdf"], {
+      env: {
+        ...process.env,
+        TESSDATA_PREFIX: path.join(path.dirname(tesseract), "tessdata"),
+      },
+      timeout: 180000,
+      maxBuffer: 1 << 26,
+    });
+
+    return fs.readFile(`${stem}.pdf`);
+  });
+}
+
 module.exports = {
+  ocrImage,
   officeToPdf,
   pdfToOffice,
   protectPdf,
