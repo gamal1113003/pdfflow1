@@ -102,9 +102,12 @@ export function TrackToolUsage(_props: { slug: string }) {
   // Analytics is a hosting feature and has no meaning offline.
   const layoutPath = path.join(work, "src/app/layout.tsx");
   let layout = await readFile(layoutPath, "utf8");
+  // Match any @vercel/* import and its component, whatever the exact path or
+  // spacing. The earlier version matched one exact string and quietly missed
+  // it, leaving an analytics script running inside an offline application.
   layout = layout
-    .replace(/^import \{ Analytics \} from "@vercel\/analytics\/next";\n/m, "")
-    .replace(/\s*<Analytics \/>/g, "");
+    .replace(/^\s*import\s+\{[^}]*\}\s+from\s+["']@vercel\/[^"']+["'];?\s*$/gm, "")
+    .replace(/\s*<(Analytics|SpeedInsights)\s*\/>/g, "");
   await writeFile(layoutPath, layout);
 
   for (const slug of REMOVED_TOOLS) {
@@ -130,9 +133,11 @@ export const toolBySlug`,
   // app answers itself using the bundled programs — same origin, no CORS, and
   // no network. ORZIX_API_URL is only a fallback for tools that were not
   // bundled, and is read by the Electron process rather than the page.
+  // Set explicitly rather than left empty, so there is no doubt where the
+  // conversions go: to this application, on this machine.
   await writeFile(
     path.join(work, ".env.production"),
-    `NEXT_PUBLIC_PDF_API_URL=\nNEXT_PUBLIC_SITE_URL=http://127.0.0.1\n`,
+    `NEXT_PUBLIC_PDF_API_URL=/api/process\nNEXT_PUBLIC_SITE_URL=http://127.0.0.1\n`,
   );
   if (API_URL) {
     console.log(`  Fallback backend for missing tools: ${API_URL}`);
@@ -239,15 +244,21 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
     path.join(aboutDir, "page.tsx"),
   );
 
-  // In the desktop build these tools run locally too, so the notice about
-  // needing a connection would be wrong.
-  const noticePath = path.join(work, "src/components/tools/ConnectionNotice.tsx");
-  let notice = await readFile(noticePath, "utf8");
-  notice = notice.replace(
-    "export function ConnectionNotice({ runsInBrowser }: { runsInBrowser: boolean }) {",
-    "export function ConnectionNotice(_props: { runsInBrowser: boolean }) {\n  const runsInBrowser = true;",
-  );
-  await writeFile(noticePath, notice);
+  // On the website every tool needs the internet, so saying so is noise. In
+  // the desktop app it is the useful distinction: some tools work with the
+  // network off and some do not, and it is not obvious which.
+  const layoutToolPath = path.join(work, "src/components/tools/ToolPageLayout.tsx");
+  let layoutTool = await readFile(layoutToolPath, "utf8");
+  layoutTool = layoutTool
+    .replace(
+      'import { ChevronRight, ShieldCheck } from "lucide-react";',
+      'import { ChevronRight } from "lucide-react";\nimport { ConnectionNotice } from "@/components/tools/ConnectionNotice";',
+    )
+    .replace(
+      /<p className="mx-auto mt-8 flex max-w-4xl[\s\S]*?<\/p>/,
+      '<div className="mx-auto mt-8 max-w-4xl">\n          <ConnectionNotice runsInBrowser={tool.runsInBrowser} />\n        </div>',
+    );
+  await writeFile(layoutToolPath, layoutTool);
 
   // The header links to pages that no longer exist.
   const headerPath = path.join(work, "src/components/site/Header.tsx");

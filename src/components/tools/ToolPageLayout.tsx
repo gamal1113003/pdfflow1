@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShieldCheck } from "lucide-react";
 import { ToolGrid } from "@/components/tools/ToolGrid";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { ToolContentSection } from "@/components/tools/ToolContentSection";
-import { ConnectionNotice } from "@/components/tools/ConnectionNotice";
 import { toolJsonLd } from "@/lib/seo";
 import { getTool, tools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -62,9 +61,10 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
           <ToolWorkspace tool={tool} />
         </div>
 
-        <div className="mx-auto mt-8 max-w-4xl">
-          <ConnectionNotice runsInBrowser={tool.runsInBrowser} />
-        </div>
+        <p className="mx-auto mt-8 flex max-w-4xl items-center justify-center gap-2 text-sm text-muted-foreground">
+          <ShieldCheck className="size-4 text-success" aria-hidden="true" />
+          {tool.runsInBrowser ? t.toolPage.inBrowser : t.toolPage.needsServer}
+        </p>
       </div>
 
       <ToolContentSection slug={slug} language={language} />
