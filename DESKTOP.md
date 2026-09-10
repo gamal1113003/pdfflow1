@@ -1,90 +1,103 @@
 # orzix desktop
 
-A desktop version containing only the tools that already run on the device.
-No account, no server, no internet connection required.
+Everything runs on the machine. No account, no server, and — once the bundled
+programs are in place — no internet connection.
 
-## Two kinds of tool
+## How it works
 
-**Work offline.** Merge, split, crop, rotate, delete pages, extract pages,
-reorder pages, the page editor, annotate, compress, watermark, sign, JPG to
-PDF, PNG to PDF, PDF to JPG. Switch off the network and they still work.
+The app opens a window onto a copy of the site, served from a small HTTP
+server on 127.0.0.1. Requests that the browser cannot handle are answered by
+the same server, using programs shipped inside the installer:
 
-**Need a connection.** PDF to Word, PDF to Excel, PDF to PowerPoint, Word to
-PDF, Excel to PDF, PowerPoint to PDF, OCR, protect, unlock. These send the file
-to your backend, because LibreOffice and Tesseract are far too large to ship
-inside the app.
+| Job | Program | Size |
+|---|---|---|
+| Word / Excel / PowerPoint, both directions | LibreOffice | ~400 MB |
+| OCR | Tesseract | ~60 MB |
+| Protect, unlock | qpdf | ~5 MB |
 
-Every tool page says which kind it is before you choose a file, and shows a
-clear message if you are offline when a connection is needed.
+Everything else — merge, split, crop, rotate, page editing, annotating,
+compressing, watermarking, signing, image conversion — already ran in the
+browser and needs nothing extra.
 
-**Not included:** translation, which needs an API route a static build cannot
-have. Accounts are absent too — there is nothing to sign in to.
+Because the page and the API share an origin, there is no CORS and no
+desktop-specific code in the web app. `pdfService.ts` posts to
+`/api/process/<job>` exactly as it does on the website; on the desktop that
+request is answered locally.
 
-## Building it
+## Building
 
-Point the app at your backend first, or the server tools will report that no
-service is connected:
+**1. Fetch the bundled programs.** Once per machine:
 
 ```bash
-# Windows
-set ORZIX_API_URL=https://your-backend.onrender.com
-
-# Mac / Linux
-export ORZIX_API_URL=https://your-backend.onrender.com
+npm run desktop:native          # everything, ~600 MB installer
+npm run desktop:native:lite     # qpdf and Tesseract only, ~200 MB
 ```
 
-Then:
+Some downloads have to be placed by hand — the script prints exactly what it
+wants and where. LibreOffice in particular is distributed differently on each
+platform.
+
+**2. Build and run:**
 
 ```bash
 npm install
-npm run desktop:build     # trims the project and exports a static site
-npm run desktop:start     # opens the app
+npm run desktop:build
+npm run desktop:start
 ```
 
-The first command copies the project to `.desktop-build`, removes the parts
-that need a server, and exports plain HTML into `desktop/app`. Your working
-project is not modified.
-
-## Making an installer
+**3. Make an installer:**
 
 ```bash
 npm run desktop:package
 ```
 
-Output lands in `desktop/dist`: `.exe` on Windows, `.dmg` on macOS,
-`.AppImage` on Linux. Each platform must be built on that platform.
+Output in `desktop/dist`. Each platform must be built on that platform.
+
+## If a program is missing
+
+The app still runs. A tool whose program was not bundled either forwards the
+job to a remote backend, if one is configured:
+
+```bash
+$env:ORZIX_API_URL = "https://your-backend.onrender.com"   # PowerShell
+export ORZIX_API_URL=https://your-backend.onrender.com     # Mac/Linux
+```
+
+or reports plainly that it needs one. It does not fail silently.
+
+Check what an installation can see by opening
+`http://127.0.0.1:<port>/api/capabilities` in the app's developer tools, or by
+watching which tools report a missing program.
+
+## Not included
+
+**Translation.** It calls a Next API route for batches of text, and a static
+build has no API routes. Adding it would mean reimplementing the batching in
+the Electron process against a translation API — possible, but it needs a
+paid key, and a tool that needs the internet sits oddly in an offline app.
+
+**Accounts.** There is nothing to sign in to.
 
 ## Before giving it to anyone else
 
 **Windows will warn people not to run it.** An unsigned installer triggers
-SmartScreen: "Windows protected your PC". The Run button hides behind "More
-info", and most people stop there.
+SmartScreen: "Windows protected your PC", with the Run button hidden behind
+"More info". Most people stop there.
 
-A code signing certificate removes that, at roughly $200–400 a year, and needs
-proof that your business exists. Even then, SmartScreen builds reputation over
-the first few hundred downloads unless you buy the more expensive EV variety.
+Code signing costs roughly $200–400 a year and requires proof that your
+business exists. Even then, SmartScreen builds reputation over the first few
+hundred downloads unless you buy the more expensive EV certificate.
 
-macOS is the same story: $99 a year for the Apple Developer Program plus
-notarisation, or users see "cannot be opened because the developer cannot be
-verified".
+macOS is the same: $99 a year plus notarisation, or users see "cannot be
+opened because the developer cannot be verified".
 
-If you distribute without signing, say so plainly on the download page and
-explain how to get past the warning. Plenty of open-source projects do this. It
-costs installs, but it is honest.
-
-## How it works
-
-`desktop/main.js` starts a small HTTP server on 127.0.0.1 and points an
-Electron window at it. Loading the files over `file://` would be simpler, but
-browsers treat that as an opaque origin and refuse to start web workers — and
-PDF.js needs a worker to render a single page.
-
-The window runs with `nodeIntegration: false`, `contextIsolation: true` and
-`sandbox: true`. The page is ordinary web content and is given no access to the
-file system beyond what a browser tab would have.
+**Check the licences before distributing.** LibreOffice is MPL 2.0, Tesseract
+is Apache 2.0, qpdf is Apache 2.0. All permit redistribution, and all require
+that you include their licence texts and say what you have bundled. Put those
+in an About page before you publish an installer.
 
 ## Keeping it in step with the web app
 
-The desktop build reads from the same `src`. Change a tool on the web and run
-`npm run desktop:build` again — the trimming script re-applies itself. Nothing
-is duplicated by hand.
+The desktop build reads the same `src`. Change a tool on the website, run
+`npm run desktop:build` again, and the trimming script re-applies itself.
+Nothing is maintained twice.

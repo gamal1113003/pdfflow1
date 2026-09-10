@@ -23,7 +23,7 @@ export async function getSession(): Promise<SessionData | null> {
     .eq("id", user.id)
     .maybeSingle();
 
-  return { email: user.email ?? "", profile: profile ?? null };
+  return { email: user.email ?? "", profile: (profile as Profile | null) ?? null };
 }
 
 export type UsageSummary = {
@@ -52,7 +52,7 @@ export async function getUsage(): Promise<UsageSummary> {
     .order("created_at", { ascending: false })
     .limit(500);
 
-  const rows = data ?? [];
+  const rows = (data ?? []) as UsageRow[];
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);

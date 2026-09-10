@@ -2,6 +2,21 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/supabase/env";
 
+/**
+ * The shape Supabase hands back from setAll. It is written out here because
+ * the client is used without the Database generic (see server.ts), and that
+ * generic is what normally carries these types.
+ *
+ * `options` is passed straight through to the cookie store, whose exact type
+ * differs between the middleware and the server helpers, so it is kept loose
+ * and cast once at the point of use.
+ */
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
+
 const PROTECTED = ["/dashboard", "/profile"];
 const AUTH_PAGES = ["/login", "/signup"];
 
@@ -24,11 +39,11 @@ export async function updateSession(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: CookieToSet[]) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
+          response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]),
         );
       },
     },

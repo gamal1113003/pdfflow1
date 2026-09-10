@@ -45,6 +45,7 @@ export function BackendWidget({ tool }: { tool: Tool }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
+  const [detail, setDetail] = useState<string | null>(null);
   const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
 
   const configured = isServiceConfigured();
@@ -91,6 +92,7 @@ export function BackendWidget({ tool }: { tool: Tool }) {
     } catch (cause) {
       if (cause instanceof ServiceUnavailableError) {
         setUnavailable(true);
+        setDetail(cause.message);
       } else {
         setError(
           cause instanceof Error
@@ -108,6 +110,7 @@ export function BackendWidget({ tool }: { tool: Tool }) {
     setResult(null);
     setError(null);
     setUnavailable(false);
+    setDetail(null);
     setPassword("");
     setConfirmPassword("");
   }
@@ -233,9 +236,8 @@ export function BackendWidget({ tool }: { tool: Tool }) {
               This one runs on a server
             </h3>
             <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
-              {tool.name} needs processing that a browser tab cannot do accurately — the layout
-              engine and font handling live on the server. This build has no conversion service
-              connected, so the job stops here rather than returning a low-quality result.
+              {detail ??
+                `${tool.name} needs processing that a browser tab cannot do accurately — the layout engine and font handling live on the server. This build has no conversion service connected, so the job stops here rather than returning a low-quality result.`}
             </p>
             <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
               Set <code className="rounded bg-muted px-1.5 py-0.5">NEXT_PUBLIC_PDF_API_URL</code> to

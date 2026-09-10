@@ -16,6 +16,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const APP_DIR = path.join(__dirname, "app");
+const api = require("./api.js");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -38,6 +39,25 @@ function serve() {
     const server = http.createServer((request, response) => {
       try {
         const url = new URL(request.url, "http://127.0.0.1");
+
+        // Conversions are answered by the bundled programs on this machine.
+        if (api.isApiPath(url.pathname)) {
+          if (request.method !== "POST") {
+            response.writeHead(405).end("Method not allowed");
+            return;
+          }
+          const job = url.pathname.replace("/api/process/", "").replace(/\/$/, "");
+          api.handle(request, response, job);
+          return;
+        }
+
+        // Reports which bundled tools this installation actually has.
+        if (url.pathname === "/api/capabilities") {
+          response.writeHead(200, { "Content-Type": "application/json" });
+          response.end(JSON.stringify(api.capabilities()));
+          return;
+        }
+
         let filePath = path.join(APP_DIR, decodeURIComponent(url.pathname));
 
         // Refuse anything that tries to climb out of the app directory.

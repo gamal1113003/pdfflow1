@@ -18,25 +18,24 @@ export type ServiceJob =
   | "ppt-to-pdf"
   | "protect-pdf"
   | "unlock-pdf"
-  | "ocr-pdf"
-    "compress-pdf"
-    "watermark-pdf"
-    "png-to-pdf"
-    "rotate-pdf"
-    "flatten-pdf"
-    "crop-pdf"
-    "translate-pdf";
+  | "ocr-pdf";
 
-export const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_PDF_API_URL ?? "";
+export const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_PDF_API_URL ?? "/api/process";
 
 export function isServiceConfigured(): boolean {
   return SERVICE_ENDPOINT.length > 0;
 }
 
+/** The API route replies 501 while no conversion engine is connected. */
+function isNotImplemented(status: number): boolean {
+  return status === 501;
+}
+
 export class ServiceUnavailableError extends Error {
-  constructor() {
+  constructor(detail?: string) {
     super(
-      "This conversion runs on a server, and no processing service is connected to this build yet.",
+      detail ||
+        "This conversion runs on a server, and no processing service is connected to this build yet.",
     );
     this.name = "ServiceUnavailableError";
   }
@@ -71,11 +70,19 @@ export async function runServiceJob(
     signal,
   });
 
+  if (isNotImplemented(response.status)) {
+    // The responder knows why better than we do — in the desktop app it will
+    // name the missing program rather than talk about servers.
+    const body = (await response.json().catch(() => ({}))) as { error?: string };
+    throw new ServiceUnavailableError(body.error);
+  }
+
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(
-      detail?.slice(0, 200) || "The conversion service could not process this file.",
-    );
+    const detail = await response
+      .json()
+      .then((body: { error?: string }) => body.error ?? "")
+      .catch(() => "");
+    throw new Error(detail || "The conversion service could not process this file.");
   }
 
   const disposition = response.headers.get("content-disposition") ?? "";

@@ -126,16 +126,16 @@ export const toolBySlug`,
   );
   await writeFile(registryPath, registry);
 
-  // Point the server-side tools at the deployed backend. Without a value they
-  // still appear, and say plainly that no service is connected.
+  // Left empty on purpose. pdfService then posts to /api/process, which the
+  // app answers itself using the bundled programs — same origin, no CORS, and
+  // no network. ORZIX_API_URL is only a fallback for tools that were not
+  // bundled, and is read by the Electron process rather than the page.
   await writeFile(
     path.join(work, ".env.production"),
-    `NEXT_PUBLIC_PDF_API_URL=${API_URL}\nNEXT_PUBLIC_SITE_URL=http://127.0.0.1\n`,
+    `NEXT_PUBLIC_PDF_API_URL=\nNEXT_PUBLIC_SITE_URL=http://127.0.0.1\n`,
   );
-  if (!API_URL) {
-    console.warn(
-      "  ORZIX_API_URL is not set — Office conversion, OCR and password tools will report no service.",
-    );
+  if (API_URL) {
+    console.log(`  Fallback backend for missing tools: ${API_URL}`);
   }
 
   // /tools reads ?category= on the server, which a static export cannot do.
@@ -192,10 +192,62 @@ export default function ToolsPage() {
     .replace("<ToolCard key={tool.slug} tool={tool} />", "<ToolCard key={tool.slug} tool={tool} compact />");
   await writeFile(explorerPath, explorer);
 
-  const homePath = path.join(work, "src/app/page.tsx");
-  let home = await readFile(homePath, "utf8");
-  home = home.replace("<ToolGrid tools={tools} />", "<ToolGrid tools={tools} compact />");
-  await writeFile(homePath, home);
+  // The desktop home screen is the tool list. The upload box, the two call to
+  // action buttons and the "how it works" steps all exist to explain a website
+  // to someone who has just arrived. Someone who has installed an application
+  // has already decided; putting a picker in front of the tools is a step in
+  // the way.
+  for (const [file, heading, sub] of [
+    ["src/app/page.tsx", "Everything you need to work with PDFs.", "Everything runs on this computer. No account, no upload."],
+    ["src/app/ru/page.tsx", "Всё, что нужно для работы с PDF.", "Всё работает на этом компьютере. Без аккаунта и без загрузки в интернет."],
+  ]) {
+    const target = path.join(work, file);
+    if (!(await exists(target))) continue;
+    const isRu = file.includes("/ru/");
+    await writeFile(
+      target,
+      `import { ToolGrid } from "@/components/tools/ToolGrid";
+import { tools } from "@/lib/tools";
+
+export default function ${isRu ? "RuHome" : "Home"}Page() {
+  return (
+    <div className="container py-10 sm:py-14">
+      <header className="max-w-2xl">
+        <h1 className="font-display text-display-md font-semibold text-foreground">
+          ${heading}
+        </h1>
+        <p className="mt-3 text-muted-foreground">${sub}</p>
+      </header>
+
+      <div className="mt-10">
+        <ToolGrid tools={tools} compact />
+      </div>
+    </div>
+  );
+}
+`,
+    );
+  }
+
+  // An About page listing what is bundled. It answers "does this actually
+  // work offline?" honestly, and carries the licence notices that shipping
+  // LibreOffice, Tesseract and qpdf obliges us to include.
+  const aboutDir = path.join(work, "src/app/bundled");
+  await mkdir(aboutDir, { recursive: true });
+  await cp(
+    path.join(root, "desktop/templates/bundled-page.tsx"),
+    path.join(aboutDir, "page.tsx"),
+  );
+
+  // In the desktop build these tools run locally too, so the notice about
+  // needing a connection would be wrong.
+  const noticePath = path.join(work, "src/components/tools/ConnectionNotice.tsx");
+  let notice = await readFile(noticePath, "utf8");
+  notice = notice.replace(
+    "export function ConnectionNotice({ runsInBrowser }: { runsInBrowser: boolean }) {",
+    "export function ConnectionNotice(_props: { runsInBrowser: boolean }) {\n  const runsInBrowser = true;",
+  );
+  await writeFile(noticePath, notice);
 
   // The header links to pages that no longer exist.
   const headerPath = path.join(work, "src/components/site/Header.tsx");

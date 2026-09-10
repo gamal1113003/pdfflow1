@@ -8,8 +8,22 @@ directories:
 
 files:
   - desktop/main.js
+  - desktop/api.js
+  - desktop/native/*.js
   - desktop/app/**/*
   - package.json
+  - node_modules/busboy/**/*
+  - node_modules/streamsearch/**/*
+
+# The bundled programs are copied beside the app rather than into the asar
+# archive, because files inside an asar cannot be executed.
+extraResources:
+  - from: desktop/native
+    to: native
+    filter:
+      - "**/*"
+      - "!*.js"
+      - "!README.md"
 
 win:
   target: nsis

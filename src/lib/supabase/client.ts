@@ -2,8 +2,8 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
-import type { Database } from "@/lib/supabase/types";
 
 export function createClient() {
-  return createBrowserClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // See the note in server.ts on why the Database generic is not used.
+  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }

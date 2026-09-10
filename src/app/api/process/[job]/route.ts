@@ -98,10 +98,9 @@ export async function POST(
         const {
           data: { user },
         } = await supabase.auth.getUser();
-       if (user) {
-  // Types collapse to never here; the RLS policy is the real guard.
-  await supabase.from("usage").insert({ user_id: user.id, tool: job } as never);
-}
+        if (user) {
+          await supabase.from("usage").insert({ user_id: user.id, tool: job });
+        }
       } catch {
         // Never fail a conversion because tracking failed.
       }
