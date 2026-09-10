@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
@@ -22,15 +21,7 @@ import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { key: "compress" as const, href: "/compress-pdf" },
-  { key: "convert" as const, href: "/tools?category=convert-from-pdf" },
-  { key: "organize" as const, href: "/tools?category=organize" },
-  { key: "edit" as const, href: "/tools?category=edit" },
-];
-
 export function Header() {
-  const pathname = usePathname();
   const { language, t } = useLanguage();
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
@@ -67,19 +58,6 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {NAV.map((item) => (
-              <Link
-                key={item.key}
-                href={pathFor(language, item.href)}
-                className={cn(
-                  "inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                  pathname === item.href && "text-foreground",
-                )}
-              >
-                {t.nav[item.key]}
-              </Link>
-            ))}
           </nav>
         </div>
 
