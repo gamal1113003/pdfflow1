@@ -31,6 +31,14 @@ export async function openDocument(bytes: Uint8Array): Promise<PDFDocumentProxy>
     return await pdfjs.getDocument({
       data: copyBytes(bytes),
 
+      // Documents that rely on the standard 14 fonts — Helvetica, Times and
+      // the rest — do not embed them, so PDF.js needs its own copies to draw
+      // the page. Without this it warns and renders nothing.
+      //
+      // The files must be copied into /public whenever pdfjs-dist is updated:
+      //   robocopy node_modules\pdfjs-dist\standard_fonts public\standard_fonts /E
+      standardFontDataUrl: "/standard_fonts/",
+
       // --- Security hardening -------------------------------------------
       // A PDF is untrusted input. These options remove the paths a crafted
       // document could use to reach outside the page.

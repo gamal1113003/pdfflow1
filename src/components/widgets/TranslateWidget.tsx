@@ -5,7 +5,7 @@ import { Languages, ScanText, ServerCog } from "lucide-react";
 import { FileUploader } from "@/components/pdf/FileUploader";
 import { FileSummary } from "@/components/pdf/FileSummary";
 import { DownloadResult } from "@/components/pdf/DownloadResult";
-import { ErrorNotice, InfoNotice } from "@/components/pdf/Notices";
+import { ErrorNotice } from "@/components/pdf/Notices";
 import { ProcessingProgress } from "@/components/pdf/ProcessingProgress";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -165,13 +165,6 @@ export function TranslateWidget() {
                   />
                 </div>
               </SettingsPanel>
-
-              <InfoNotice title="Read this before you start">
-                Unlike the other tools, this one sends the text of your document to a translation
-                provider. The file never leaves your device, but the words in it do. The result is
-                a readable text document — the original layout, images and tables are not
-                reproduced, because translated text is a different length and would not fit.
-              </InfoNotice>
 
               <Button size="lg" className="w-full sm:w-auto" onClick={run}>
                 <Languages aria-hidden="true" />
