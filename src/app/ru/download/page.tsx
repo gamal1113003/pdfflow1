@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Скачать orzix для Windows — офлайн-инструменты для PDF | orzix",
+  title: "Установить orzix — инструменты для PDF на вашем устройстве | orzix",
   description:
-    "Установите orzix на компьютер и работайте с PDF без интернета. Или добавьте веб-версию на устройство одним нажатием.",
+    "Добавьте orzix на устройство и работайте с PDF в одно нажатие. Большинство инструментов работает без интернета.",
   path: "/download",
   locale: "ru",
 });
