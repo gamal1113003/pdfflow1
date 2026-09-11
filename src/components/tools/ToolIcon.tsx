@@ -2,6 +2,7 @@
 
 import {
   ArrowLeftRight,
+  Briefcase,
   Columns2,
   Combine,
   Crop,
@@ -21,6 +22,7 @@ import {
   PenLine,
   PencilRuler,
   Presentation,
+  ReceiptText,
   RotateCw,
   ScanText,
   Scissors,
@@ -34,6 +36,7 @@ import {
 
 const ICONS: Record<string, LucideIcon> = {
   ArrowLeftRight,
+  Briefcase,
   Columns2,
   Combine,
   Crop,
@@ -53,6 +56,7 @@ const ICONS: Record<string, LucideIcon> = {
   PenLine,
   PencilRuler,
   Presentation,
+  ReceiptText,
   RotateCw,
   ScanText,
   Scissors,

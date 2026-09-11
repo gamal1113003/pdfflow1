@@ -29,6 +29,8 @@ export type ToolWidget =
   | "ocr-local"
   | "compare"
   | "redact"
+  | "invoice"
+  | "application"
   | "backend";
 
 export type Tool = {
@@ -383,6 +385,37 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "create-invoice",
+    name: "Create Invoice",
+    description: "Build an invoice and download it as a PDF.",
+    lede: "Fill in the details and get a clean, printable invoice.",
+    categories: ["edit"],
+    icon: "ReceiptText",
+    widget: "invoice",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Free Invoice Generator — Create an Invoice PDF | orzix",
+      description:
+        "Create an invoice online and download it as a PDF. Add your logo, line items, discounts and tax, in any currency. Runs in your browser.",
+    },
+  },
+  {
+    slug: "job-application",
+    name: "Job Application",
+    description: "Combine a covering letter and your documents into one PDF.",
+    lede: "Write the letter, attach your CV and certificates, and get one file to send.",
+    categories: ["edit", "organize"],
+    icon: "Briefcase",
+    widget: "application",
+    runsInBrowser: true,
+    seo: {
+      title: "Create a Job Application PDF — Letter and CV in One File | orzix",
+      description:
+        "Write a covering letter and attach your CV and certificates as a single PDF, ready to send. Runs entirely in your browser.",
     },
   },
   {
