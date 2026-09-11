@@ -62,6 +62,12 @@ export function Header() {
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Link
+            href={pathFor(language, "/download")}
+            className="inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {t.footer.download}
+          </Link>
           <LanguageToggle />
           <ThemeToggle />
           <Button asChild variant="ghost" size="sm">

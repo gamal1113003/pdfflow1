@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/site/ThemeProvider";
 import { PendingFileProvider } from "@/components/pdf/PendingFileProvider";
 import { ServiceWorker } from "@/components/site/ServiceWorker";
 import { InstallPrompt } from "@/components/site/InstallPrompt";
+import { DesktopPromo } from "@/components/site/DesktopPromo";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Header />
             <main id="main">{children}</main>
             <Footer />
+            <DesktopPromo />
             <InstallPrompt />
             <ServiceWorker />
             </PendingFileProvider>
