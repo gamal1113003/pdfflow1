@@ -22,6 +22,7 @@ const WIDGETS: Record<ToolWidget, ComponentType<{ tool: Tool }>> = {
   "pdf-to-images": dynamic(() => import("@/components/widgets/PdfToImagesWidget").then((m) => m.PdfToImagesWidget), { ssr: false, loading }),
   watermark: dynamic(() => import("@/components/widgets/WatermarkWidget").then((m) => m.WatermarkWidget), { ssr: false, loading }),
   "edit-content": dynamic(() => import("@/components/widgets/EditContentWidget").then((m) => m.EditContentWidget), { ssr: false, loading }),
+  qr: dynamic(() => import("@/components/widgets/QrWidget").then((m) => m.QrWidget), { ssr: false, loading }),
   invoice: dynamic(() => import("@/components/widgets/InvoiceWidget").then((m) => m.InvoiceWidget), { ssr: false, loading }),
   application: dynamic(() => import("@/components/widgets/ApplicationWidget").then((m) => m.ApplicationWidget), { ssr: false, loading }),
   redact: dynamic(() => import("@/components/widgets/RedactWidget").then((m) => m.RedactWidget), { ssr: false, loading }),

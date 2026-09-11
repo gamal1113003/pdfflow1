@@ -97,6 +97,11 @@ const ru: Record<string, { name: string; description: string; lede: string }> = 
     description: "Обрезать поля и оставить только нужное.",
     lede: "Выделите рамкой нужную область и оставьте только её.",
   },
+  "qr-code": {
+    name: "QR-код",
+    description: "Создать QR-код для ссылки, текста, Wi-Fi или контактов.",
+    lede: "Создайте QR-код и скачайте его как изображение или PDF для печати.",
+  },
   "create-invoice": {
     name: "Создать счёт",
     description: "Составить счёт и скачать его в формате PDF.",
@@ -205,6 +210,11 @@ const ruSeo: Record<string, { title: string; description: string }> = {
     title: "Добавить текст и заметки в PDF онлайн | orzix",
     description:
       "Пишите поверх PDF: текст, рисунки, выделение, затемнение и изображения. Поддерживается кириллица.",
+  },
+  "qr-code": {
+    title: "Генератор QR-кодов — бесплатно и без регистрации | orzix",
+    description:
+      "Создайте QR-код для сайта, текста, почты, телефона или сети Wi-Fi. Скачайте в PNG, SVG или PDF для печати. Работает в браузере.",
   },
   "create-invoice": {
     title: "Создать счёт онлайн — генератор счетов в PDF | orzix",

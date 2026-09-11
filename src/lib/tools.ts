@@ -31,6 +31,7 @@ export type ToolWidget =
   | "redact"
   | "invoice"
   | "application"
+  | "qr"
   | "backend";
 
 export type Tool = {
@@ -385,6 +386,22 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "qr-code",
+    name: "QR Code",
+    description: "Create a QR code for a link, text, Wi-Fi or contact details.",
+    lede: "Make a QR code and download it as an image or a printable PDF.",
+    categories: ["image", "edit"],
+    icon: "QrCode",
+    widget: "qr",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "QR Code Generator — Free, No Sign-up | orzix",
+      description:
+        "Create a QR code for a website, text, email, phone number or Wi-Fi network. Download as PNG, SVG or a printable PDF. Runs in your browser.",
     },
   },
   {
