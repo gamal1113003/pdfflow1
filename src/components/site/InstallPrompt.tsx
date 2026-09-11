@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-
-type InstallEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
+import { useInstall } from "@/lib/pwa/install";
 
 const COPY = {
   en: {
@@ -37,26 +33,20 @@ const DISMISSED_KEY = "orzix.install-dismissed";
 export function InstallPrompt() {
   const { language } = useLanguage();
   const t = COPY[language === "ru" ? "ru" : "en"];
-  const [event, setEvent] = useState<InstallEvent | null>(null);
+  // Shared with the download page: the browser only offers the install event
+  // once, so both read it from the same place.
+  const { canInstall, install } = useInstall();
+  const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    if (window.localStorage.getItem(DISMISSED_KEY)) return;
-
-    const onPrompt = (incoming: Event) => {
-      // Chrome shows its own bar unless this is prevented.
-      incoming.preventDefault();
-      setEvent(incoming as InstallEvent);
-    };
-
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+    setDismissed(Boolean(window.localStorage.getItem(DISMISSED_KEY)));
   }, []);
 
-  if (!event) return null;
+  if (!canInstall || dismissed) return null;
 
   const dismiss = () => {
     window.localStorage.setItem(DISMISSED_KEY, "1");
-    setEvent(null);
+    setDismissed(true);
   };
 
   return (
@@ -69,14 +59,7 @@ export function InstallPrompt() {
           <p className="font-display font-semibold">{t.title}</p>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.body}</p>
           <div className="mt-4 flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={async () => {
-                await event.prompt();
-                await event.userChoice;
-                setEvent(null);
-              }}
-            >
+            <Button size="sm" onClick={() => void install()}>
               {t.install}
             </Button>
             <Button variant="ghost" size="sm" onClick={dismiss}>

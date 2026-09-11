@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { AlertTriangle, Check, Globe, Monitor } from "lucide-react";
+import { AlertTriangle, Check, Download, Globe, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { pathFor } from "@/lib/i18n/locale";
+import { useInstall } from "@/lib/pwa/install";
 
 /**
  * Where the Windows installer lives. Left unset the page says the download is
@@ -27,7 +26,10 @@ const COPY = {
       "On Chrome or Edge: click the install icon in the address bar.",
       "On Safari: choose Share, then Add to Dock or Add to Home Screen.",
     ],
-    webCta: "Open the tools",
+    webCta: "Install",
+    webInstalled: "Already installed",
+    webInstalledBody: "orzix is on this device. Open it from your home screen or app list.",
+    webManual: "Your browser cannot install from a button. Use the steps above instead.",
     desktopTitle: "Windows application",
     desktopBody:
       "A separate program that carries everything it needs inside it — including the software for Word conversion and text recognition. It works with the network switched off entirely.",
@@ -57,7 +59,10 @@ const COPY = {
       "В Chrome или Edge: нажмите значок установки в адресной строке.",
       "В Safari: «Поделиться», затем «Добавить в Dock» или «На экран «Домой»».",
     ],
-    webCta: "Открыть инструменты",
+    webCta: "Установить",
+    webInstalled: "Уже установлено",
+    webInstalledBody: "orzix есть на этом устройстве. Откройте его с главного экрана или из списка приложений.",
+    webManual: "Ваш браузер не умеет устанавливать по кнопке. Используйте шаги выше.",
     desktopTitle: "Программа для Windows",
     desktopBody:
       "Отдельная программа, которая несёт всё необходимое внутри себя — включая софт для конвертации Word и распознавания текста. Работает при полностью отключённой сети.",
@@ -80,6 +85,7 @@ const COPY = {
 export function DownloadPage() {
   const { language } = useLanguage();
   const t = COPY[language === "ru" ? "ru" : "en"];
+  const { canInstall, installed, install } = useInstall();
 
   return (
     <div className="container py-14 sm:py-16">
@@ -97,19 +103,35 @@ export function DownloadPage() {
           <h2 className="mt-5 font-display text-xl font-semibold tracking-tight">{t.webTitle}</h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">{t.webBody}</p>
 
-          <h3 className="mt-6 font-display text-sm font-semibold">{t.webHow}</h3>
-          <ul className="mt-3 space-y-2">
-            {t.webSteps.map((step) => (
-              <li key={step} className="flex gap-2.5 text-sm text-muted-foreground">
-                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                {step}
-              </li>
-            ))}
-          </ul>
-
-          <Button asChild size="lg" className="mt-7">
-            <Link href={pathFor(language, "/tools")}>{t.webCta}</Link>
-          </Button>
+          {installed ? (
+            <div className="mt-6 rounded-xl border border-success/25 bg-success-soft p-4">
+              <p className="text-sm font-medium text-success">{t.webInstalled}</p>
+              <p className="mt-1 text-sm leading-relaxed text-success/85">
+                {t.webInstalledBody}
+              </p>
+            </div>
+          ) : canInstall ? (
+            /* The browser handed us an install offer, so one press does it.
+               Its own confirmation dialog still appears — that is the
+               browser's, and a site cannot install itself silently. */
+            <Button size="lg" className="mt-7" onClick={() => void install()}>
+              <Download aria-hidden="true" />
+              {t.webCta}
+            </Button>
+          ) : (
+            <>
+              <h3 className="mt-6 font-display text-sm font-semibold">{t.webHow}</h3>
+              <ul className="mt-3 space-y-2">
+                {t.webSteps.map((step) => (
+                  <li key={step} className="flex gap-2.5 text-sm text-muted-foreground">
+                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                    {step}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-sm text-muted-foreground">{t.webManual}</p>
+            </>
+          )}
         </div>
 
         {/* The Windows application. */}
