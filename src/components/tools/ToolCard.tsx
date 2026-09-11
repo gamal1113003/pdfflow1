@@ -45,11 +45,6 @@ export function ToolCard({
 
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium text-foreground">{copy.name}</span>
-          {!tool.runsInBrowser && (
-            <span className="block text-[0.7rem] text-muted-foreground">
-              {t.toolPage.server}
-            </span>
-          )}
         </span>
       </Link>
     );
@@ -82,11 +77,6 @@ export function ToolCard({
         />
       </span>
 
-      {!tool.runsInBrowser && (
-        <span className="absolute right-5 top-5 rounded-full border border-border px-2 py-0.5 text-[0.7rem] font-medium text-muted-foreground">
-          {t.toolPage.server}
-        </span>
-      )}
     </Link>
   );
 }

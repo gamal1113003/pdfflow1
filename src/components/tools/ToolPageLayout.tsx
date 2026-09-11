@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, ShieldCheck } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { ToolGrid } from "@/components/tools/ToolGrid";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { toolJsonLd } from "@/lib/seo";
@@ -60,10 +60,6 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
           <ToolWorkspace tool={tool} />
         </div>
 
-        <p className="mx-auto mt-8 flex max-w-4xl items-center justify-center gap-2 text-sm text-muted-foreground">
-          <ShieldCheck className="size-4 text-success" aria-hidden="true" />
-          {tool.runsInBrowser ? t.toolPage.inBrowser : t.toolPage.needsServer}
-        </p>
       </div>
 
       {related.length > 0 && (

@@ -304,7 +304,7 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
   layoutTool = layoutTool
     .replace(
       /import \{[^}]*\} from "lucide-react";/,
-      'import { ArrowLeft, ShieldCheck } from "lucide-react";',
+      'import { ArrowLeft } from "lucide-react";',
     )
     .replace(
       /<nav aria-label=\{t\.toolPage\.breadcrumb\}[\s\S]*?<\/nav>/,
