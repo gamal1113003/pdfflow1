@@ -7,7 +7,7 @@ import { useInstall } from "@/lib/pwa/install";
 
 const COPY = {
   en: {
-    title: "Application",
+    title: "Install orzix",
     lede: "Add it to your device and the tools are one tap away — on Windows, Mac, Android or iPhone.",
     cta: "Install",
     installed: "Already installed",
@@ -29,7 +29,7 @@ const COPY = {
       "Converting Office documents, reading scanned text and translating need a connection, because they rely on software too large to run on your device. Everything else does not.",
   },
   ru: {
-    title: "Приложение",
+    title: "Установить orzix",
     lede: "Добавьте на устройство — инструменты будут в одно нажатие: Windows, Mac, Android или iPhone.",
     cta: "Установить",
     installed: "Уже установлено",
