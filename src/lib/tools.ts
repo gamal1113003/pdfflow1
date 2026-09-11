@@ -28,6 +28,7 @@ export type ToolWidget =
   | "translate"
   | "ocr-local"
   | "compare"
+  | "redact"
   | "backend";
 
 export type Tool = {
@@ -382,6 +383,22 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "blacken-pdf",
+    name: "Blacken PDF",
+    description: "Permanently remove private parts of a document.",
+    lede: "Black out anything private — and have it genuinely removed, not just covered.",
+    categories: ["edit", "security"],
+    icon: "SquareSlash",
+    widget: "redact",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Blacken PDF Online — Redact and Remove Text for Good | orzix",
+      description:
+        "Black out private information in a PDF and have it permanently removed rather than hidden. Runs in your browser; the file is never uploaded.",
     },
   },
   {

@@ -26,6 +26,7 @@ import {
   Scissors,
   Sheet,
   Signature,
+  SquareSlash,
   Table2,
   Trash2,
   type LucideIcon,
@@ -57,6 +58,7 @@ const ICONS: Record<string, LucideIcon> = {
   Scissors,
   Sheet,
   Signature,
+  SquareSlash,
   Table2,
   Trash2,
 };
