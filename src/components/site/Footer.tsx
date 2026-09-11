@@ -34,6 +34,7 @@ export function Footer() {
       heading: t.footer.company,
       links: [
         { label: t.footer.about, href: "/about" },
+        { label: t.footer.download, href: "/download" },
         { label: t.footer.contact, href: "/contact" },
       ],
     },

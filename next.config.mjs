@@ -98,7 +98,18 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: false },
 
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        // A cached service worker is a service worker that can never be
+        // replaced, which would freeze the site on an old version.
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+    ];
   },
 
   webpack: (config) => {

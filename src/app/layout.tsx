@@ -4,10 +4,11 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ThemeProvider } from "@/components/site/ThemeProvider";
 import { PendingFileProvider } from "@/components/pdf/PendingFileProvider";
+import { ServiceWorker } from "@/components/site/ServiceWorker";
+import { InstallPrompt } from "@/components/site/InstallPrompt";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { site } from "@/lib/site";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +31,8 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
+  manifest: "/site.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: site.name },
   openGraph: {
     type: "website",
     siteName: site.name,
@@ -62,7 +65,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <LanguageProvider>
-               <Analytics />
             <PendingFileProvider>
             <a
               href="#main"
@@ -73,6 +75,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Header />
             <main id="main">{children}</main>
             <Footer />
+            <InstallPrompt />
+            <ServiceWorker />
             </PendingFileProvider>
           </LanguageProvider>
         </ThemeProvider>
