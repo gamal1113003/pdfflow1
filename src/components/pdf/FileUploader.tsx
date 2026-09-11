@@ -24,7 +24,11 @@ export type FileUploaderProps = {
   onFiles: (files: File[]) => void;
 };
 
-/** A long extension list is unreadable, so it is summarised. */
+/**
+ * Summarises the accepted list, since ".doc, .docx, .xls, .xlsx, .ppt, .pptx"
+ * is unreadable. Built from the actual list rather than hardcoded, so a tool
+ * that takes documents only does not advertise images.
+ */
 function describeAccepted(extensions: string[], maxBytes: number): string {
   const size = `up to ${Math.round(maxBytes / 1024 / 1024)} MB`;
   const has = (name: string) => extensions.includes(name);
@@ -37,12 +41,11 @@ function describeAccepted(extensions: string[], maxBytes: number): string {
   if (has("png")) groups.push("PNG");
   if (has("jpg") || has("jpeg")) groups.push("JPG");
 
-  if (groups.length > 0) {
-    return `${groups.join(", ")} · ${size}`;
+  if (groups.length === 0) {
+    return `${extensions.map((e) => e.toUpperCase()).join(", ")} · ${size}`;
   }
-  return `${extensions.map((e) => e.toUpperCase()).join(", ")} · ${size}`;
+  return `${groups.join(", ")} · ${size}`;
 }
-
 
 export function FileUploader({
   extensions = ["pdf"],
@@ -140,7 +143,7 @@ export function FileUploader({
           {busy ? busyLabel : title}
         </h3>
         <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground">
-          {busy ? "Word, Excel and PowerPoint files are converted on the server." : hint}
+          {busy ? "Word, Excel and PowerPoint files take a moment to convert." : hint}
         </p>
 
         <Button

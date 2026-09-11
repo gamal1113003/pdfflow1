@@ -20,7 +20,10 @@ export type ServiceJob =
   | "unlock-pdf"
   | "ocr-pdf";
 
-export const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_PDF_API_URL ?? "/api/process";
+// `||` rather than `??`: an empty NEXT_PUBLIC_PDF_API_URL should fall back to
+// the built-in route, not be treated as a configured value. `??` only catches
+// undefined, so an empty string sailed through and the endpoint became "".
+export const SERVICE_ENDPOINT = process.env.NEXT_PUBLIC_PDF_API_URL || "/api/process";
 
 export function isServiceConfigured(): boolean {
   return SERVICE_ENDPOINT.length > 0;
@@ -35,7 +38,7 @@ export class ServiceUnavailableError extends Error {
   constructor(detail?: string) {
     super(
       detail ||
-        "This conversion runs on a server, and no processing service is connected to this build yet.",
+        "This conversion needs a connection, and nothing is connected to this build yet.",
     );
     this.name = "ServiceUnavailableError";
   }
@@ -78,11 +81,15 @@ export async function runServiceJob(
   }
 
   if (!response.ok) {
-    const detail = await response
-      .json()
-      .then((body: { error?: string }) => body.error ?? "")
-      .catch(() => "");
-    throw new Error(detail || "The conversion service could not process this file.");
+    // The backend sends a short message plus a `detail` field carrying the
+    // real output from the program that failed. Showing only the short one
+    // means "OCR failed." and nothing to act on.
+    const body = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      detail?: string;
+    };
+    const message = [body.error, body.detail].filter(Boolean).join(" ");
+    throw new Error(message || "The conversion service could not process this file.");
   }
 
   const disposition = response.headers.get("content-disposition") ?? "";

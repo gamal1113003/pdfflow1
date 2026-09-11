@@ -214,8 +214,7 @@ export function TranslateWidget() {
             </h3>
             <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
               Photos, scans and images contain pixels rather than text. Text recognition can read
-              the words off the page first, and then they can be translated. This runs on the
-              server and takes a little longer.
+              the words off the page first, and then they can be translated. This takes a little longer.
             </p>
             <Button size="sm" onClick={runOcrThenTranslate}>
               <ScanText aria-hidden="true" />

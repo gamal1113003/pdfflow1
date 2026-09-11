@@ -8,7 +8,7 @@ const COPY = {
   en: {
     needsInternet: "This tool needs an internet connection",
     needsInternetBody:
-      "Converting Office documents and reading scanned text is done on a server, because the software involved is far too large to run here. The file is sent, processed and deleted immediately.",
+      "Converting Office documents and reading scanned text needs software too large to run here, so the file is sent away, processed and deleted immediately.",
     offline: "You are offline",
     offlineBody:
       "This tool cannot run without a connection. Everything else — merging, splitting, cropping, rotating, compressing, watermarking, signing and image conversion — works offline.",

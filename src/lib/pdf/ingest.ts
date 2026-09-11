@@ -100,7 +100,7 @@ async function officeToPdf(file: File): Promise<Uint8Array> {
   } catch (error) {
     if (error instanceof ServiceUnavailableError) {
       throw new PdfError(
-        "Word, Excel and PowerPoint files are converted on a server, and none is connected to this build. Save the file as PDF and upload that instead.",
+        "Word, Excel and PowerPoint files need a connection, and nothing is connected to this build. Save the file as PDF and upload that instead.",
       );
     }
     throw error;

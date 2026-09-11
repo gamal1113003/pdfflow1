@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ServerCog, ShieldAlert } from "lucide-react";
+import { CloudOff, ShieldAlert } from "lucide-react";
 import { FileUploader } from "@/components/pdf/FileUploader";
 import { FileSummary } from "@/components/pdf/FileSummary";
 import { DownloadResult } from "@/components/pdf/DownloadResult";
@@ -26,7 +26,7 @@ import { formatBytes } from "@/lib/utils";
 type Fields = "set-password" | "enter-password" | undefined;
 
 /**
- * Frontend for the jobs that need a server: Office conversion, OCR and
+ * Frontend for the jobs that need more than a browser: Office conversion, OCR and
  * PDF encryption. The upload, validation, options and result flow are all
  * real — only the conversion itself is delegated to `pdfService`.
  */
@@ -229,22 +229,17 @@ export function BackendWidget({ tool }: { tool: Tool }) {
       {(unavailable || !configured) && (
         <div className="flex gap-4 rounded-2xl border border-border bg-card p-6 shadow-card">
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-muted text-muted-foreground">
-            <ServerCog className="size-5" aria-hidden="true" />
+            <CloudOff className="size-5" aria-hidden="true" />
           </span>
           <div className="space-y-2">
             <h3 className="font-display text-lg font-semibold tracking-tight">
-              This one runs on a server
+              This one needs a connection
             </h3>
             <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
               {detail ??
-                `${tool.name} needs processing that a browser tab cannot do accurately — the layout engine and font handling live on the server. This build has no conversion service connected, so the job stops here rather than returning a low-quality result.`}
+                `${tool.name} needs software too large to run inside a browser tab — the layout engine and font handling are not something a web page can do accurately. Nothing is connected to this build yet, so the job stops here rather than handing back a poor result.`}
             </p>
-            <p className="max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
-              Set <code className="rounded bg-muted px-1.5 py-0.5">NEXT_PUBLIC_PDF_API_URL</code> to
-              your service and this tool starts working, using the same upload and download flow
-              you see here. The contract is in{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5">lib/services/pdfService.ts</code>.
-            </p>
+
           </div>
         </div>
       )}
@@ -252,7 +247,7 @@ export function BackendWidget({ tool }: { tool: Tool }) {
       {!configured && !file && (
         <InfoNotice title="Everything else still works">
           Merging, splitting, rotating, compressing, watermarking, signing and image conversion all
-          run in your browser with no server at all.
+          run on your own device, with no connection at all.
         </InfoNotice>
       )}
 

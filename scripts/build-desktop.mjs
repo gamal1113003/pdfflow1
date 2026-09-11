@@ -296,6 +296,32 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
     console.log(`  Marked as local: ${nowLocal.join(", ")}`);
   }
 
+  // A breadcrumb suits a website, where people arrive from a search result deep
+  // inside the site. In an application the useful thing is one obvious way back
+  // to the list of tools.
+  const layoutToolPath = path.join(work, "src/components/tools/ToolPageLayout.tsx");
+  let layoutTool = await readFile(layoutToolPath, "utf8");
+  layoutTool = layoutTool
+    .replace(
+      /import \{[^}]*\} from "lucide-react";/,
+      'import { ArrowLeft, ShieldCheck } from "lucide-react";',
+    )
+    .replace(
+      /<nav aria-label=\{t\.toolPage\.breadcrumb\}[\s\S]*?<\/nav>/,
+      [
+        '<div className="mb-8">',
+        '          <Link',
+        '            href={pathFor(language, "/tools")}',
+        '            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-foreground/20 hover:bg-muted"',
+        '          >',
+        '            <ArrowLeft className="size-4" aria-hidden="true" />',
+        '            {t.nav.browseAll}',
+        '          </Link>',
+        '        </div>',
+      ].join("\n"),
+    );
+  await writeFile(layoutToolPath, layoutTool);
+
   // The header links to pages that no longer exist.
   const headerPath = path.join(work, "src/components/site/Header.tsx");
   let header = await readFile(headerPath, "utf8");

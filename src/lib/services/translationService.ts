@@ -39,7 +39,7 @@ export const TRANSLATE_LANGUAGES = [
 export class TranslationNotConfiguredError extends Error {
   constructor() {
     super(
-      "Translation runs on a server and needs a provider API key. None is connected to this deployment.",
+      "Translation needs a provider API key, and none is connected to this deployment.",
     );
     this.name = "TranslationNotConfiguredError";
   }
