@@ -812,11 +812,31 @@ export function toolsInCategory(category: ToolCategory | "all"): Tool[] {
   return tools.filter((tool) => tool.categories.includes(category));
 }
 
+/**
+ * Searches the English text only. Prefer `searchToolsIn` from the component,
+ * which also covers the translated names — searching "объединить" against the
+ * English registry finds nothing, which is how this started out.
+ */
 export function searchTools(query: string, category: ToolCategory | "all" = "all"): Tool[] {
+  return searchToolsWith(query, category, () => "");
+}
+
+/**
+ * `extra` supplies any additional text for a tool — in practice its
+ * translation. Passed in rather than imported so that this file, which every
+ * page loads, does not pull in the dictionaries.
+ */
+export function searchToolsWith(
+  query: string,
+  category: ToolCategory | "all",
+  extra: (tool: Tool) => string,
+): Tool[] {
   const pool = toolsInCategory(category);
   const q = query.trim().toLowerCase();
   if (!q) return pool;
   return pool.filter((tool) =>
-    `${tool.name} ${tool.description} ${tool.lede} ${tool.slug}`.toLowerCase().includes(q),
+    `${tool.name} ${tool.description} ${tool.lede} ${tool.slug} ${extra(tool)}`
+      .toLowerCase()
+      .includes(q),
   );
 }

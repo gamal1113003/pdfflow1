@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { ToolCard } from "@/components/tools/ToolCard";
-import { searchTools, type ToolCategory } from "@/lib/tools";
+import { searchToolsWith, type ToolCategory } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { translateTool } from "@/lib/i18n/toolStrings";
 import { fill } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +26,7 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
   // static HTML and still respond to /tools?category=organize.
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   // The header links point at /tools?category=organize and similar. Moving
   // between them is a navigation within the same route, so this component is
@@ -37,7 +38,16 @@ export function ToolsExplorer({ initialCategory = "all" }: { initialCategory?: T
     setCategory(valid ? (requested as ToolCategory) : initialCategory);
   }, [searchParams, initialCategory]);
 
-  const results = useMemo(() => searchTools(query, category), [query, category]);
+  // Matches the translated name and description as well as the English ones,
+  // so "объединить" finds Merge PDF while "merge" still does too.
+  const results = useMemo(
+    () =>
+      searchToolsWith(query, category, (tool) => {
+        const copy = translateTool(language, tool.slug, tool);
+        return `${copy.name} ${copy.description} ${copy.lede}`;
+      }),
+    [query, category, language],
+  );
 
   const categories = [
     { id: "all" as const, label: t.toolsPage.all },
