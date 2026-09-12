@@ -38,6 +38,8 @@ export type ToolWidget =
   | "pages-per-sheet"
   | "metadata"
   | "image-optimise"
+  | "fill-form"
+  | "scan"
   | "backend";
 
 export type Tool = {
@@ -392,6 +394,38 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "scan-to-pdf",
+    name: "Scan with Camera",
+    description: "Photograph a document and get a clean, straight PDF.",
+    lede: "Take a picture of a page and have it come out square and legible.",
+    categories: ["convert-to-pdf", "image"],
+    icon: "Camera",
+    widget: "scan",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Scan to PDF with Your Camera — Free, in the Browser | orzix",
+      description:
+        "Photograph a document and get a straightened, cleaned-up PDF. Corrects the angle and the lighting. Nothing is uploaded — it all happens on your device.",
+    },
+  },
+  {
+    slug: "fill-form",
+    name: "Fill a Form",
+    description: "Type into a PDF form and save it.",
+    lede: "Fill in the fields of a PDF form, and lock them if you want.",
+    categories: ["edit"],
+    icon: "PenLine",
+    widget: "fill-form",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Fill PDF Forms Online — Free, No Sign-up | orzix",
+      description:
+        "Type into a PDF form's own fields and save it, keeping the values editable or locking them in. Runs entirely in your browser.",
     },
   },
   {

@@ -59,7 +59,10 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value: [
-      "camera=()",
+      // The scanning tool needs this. `camera=()` denies it to everyone
+      // including ourselves, so the permission prompt never even appears.
+      // `(self)` still blocks any embedded frame from asking.
+      "camera=(self)",
       "microphone=()",
       "geolocation=()",
       "payment=()",

@@ -22,6 +22,8 @@ const WIDGETS: Record<ToolWidget, ComponentType<{ tool: Tool }>> = {
   "pdf-to-images": dynamic(() => import("@/components/widgets/PdfToImagesWidget").then((m) => m.PdfToImagesWidget), { ssr: false, loading }),
   watermark: dynamic(() => import("@/components/widgets/WatermarkWidget").then((m) => m.WatermarkWidget), { ssr: false, loading }),
   "edit-content": dynamic(() => import("@/components/widgets/EditContentWidget").then((m) => m.EditContentWidget), { ssr: false, loading }),
+  scan: dynamic(() => import("@/components/widgets/ScanWidget").then((m) => m.ScanWidget), { ssr: false, loading }),
+  "fill-form": dynamic(() => import("@/components/widgets/FillFormWidget").then((m) => m.FillFormWidget), { ssr: false, loading }),
   "page-numbers": dynamic(() => import("@/components/widgets/PageNumbersWidget").then((m) => m.PageNumbersWidget), { ssr: false, loading }),
   "pdf-to-text": dynamic(() => import("@/components/widgets/PdfToTextWidget").then((m) => m.PdfToTextWidget), { ssr: false, loading }),
   "extract-images": dynamic(() => import("@/components/widgets/ExtractImagesWidget").then((m) => m.ExtractImagesWidget), { ssr: false, loading }),
