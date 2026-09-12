@@ -6,6 +6,7 @@ import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageToggle } from "@/components/site/LanguageToggle";
 import { InstallLink } from "@/components/site/InstallLink";
+import { useInstall } from "@/lib/pwa/install";
 import { ToolIcon } from "@/components/tools/ToolIcon";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,10 @@ import { cn } from "@/lib/utils";
 
 export function Header() {
   const { language, t } = useLanguage();
+  // True in the installed app and in the desktop build. Signing in belongs on
+  // the website; in an app with no account behind it, the buttons are two
+  // dead ends taking up the bar.
+  const { installed } = useInstall();
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between gap-6">
@@ -66,12 +71,16 @@ export function Header() {
           <InstallLink />
           <LanguageToggle />
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm">
-            <Link href={pathFor(language, "/login")}>Log in</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href={pathFor(language, "/signup")}>{t.nav.getStarted}</Link>
-          </Button>
+          {!installed && (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href={pathFor(language, "/login")}>Log in</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href={pathFor(language, "/signup")}>{t.nav.getStarted}</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* No slide-out panel on small screens: the controls that matter fit
