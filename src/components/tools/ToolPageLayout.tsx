@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { ToolGrid } from "@/components/tools/ToolGrid";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { toolJsonLd } from "@/lib/seo";
-import { getTool, tools } from "@/lib/tools";
+import { getTool } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { Language } from "@/lib/i18n/dictionaries";
 import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
-import { fill } from "@/lib/i18n/dictionaries";
 
 export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Language }) {
   const context = useLanguage();
@@ -18,10 +16,6 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
   const t = context.t;
   const tool = getTool(slug);
   const copy = translateTool(language, tool.slug, tool);
-  const related = tools
-    .filter((item) => item.slug !== tool.slug)
-    .filter((item) => item.categories.some((category) => tool.categories.includes(category)))
-    .slice(0, 4);
 
   return (
     <>
@@ -55,21 +49,6 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
 
       </div>
 
-      {related.length > 0 && (
-        <section className="border-t border-border bg-card py-16" aria-labelledby="related-tools">
-          <div className="container">
-            <h2 id="related-tools" className="font-display text-display-sm font-semibold">
-              {t.toolPage.relatedTitle}
-            </h2>
-            <p className="mt-2 text-muted-foreground">
-              {fill(t.toolPage.relatedSubtitle, { name: copy.name })}
-            </p>
-            <div className="mt-8">
-              <ToolGrid tools={related} />
-            </div>
-          </div>
-        </section>
-      )}
     </>
   );
 }

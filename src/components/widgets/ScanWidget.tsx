@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, FileDown, ImagePlus, RotateCcw, X } from "lucide-react";
+import { Camera, FileDown, ImagePlus, RotateCcw, SwitchCamera, X } from "lucide-react";
 import { FileUploader } from "@/components/pdf/FileUploader";
 import { DownloadResult } from "@/components/pdf/DownloadResult";
 import { ErrorNotice } from "@/components/pdf/Notices";
@@ -33,6 +33,11 @@ export function ScanWidget() {
   const [active, setActive] = useState(0);
   const [preview, setPreview] = useState<string | null>(null);
   const [cameraOn, setCameraOn] = useState(false);
+  // The rear camera is the sensible default for photographing paper, but a
+  // laptop has only a front one, and some people want to see what they are
+  // capturing.
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [canSwitch, setCanSwitch] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [result, setResult] = useState<Uint8Array | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -53,15 +58,31 @@ export function ScanWidget() {
 
   useEffect(() => stopCamera, [stopCamera]);
 
-  async function startCamera() {
+  async function startCamera(which: "environment" | "user" = facing) {
     setError(null);
+    // Any existing stream has to be released first: a device will not hand out
+    // the same camera twice, and on some phones it will not hand out the other
+    // one while the first is still open.
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        // The rear camera on a phone, where one exists.
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 2560 } },
+        // `ideal` rather than `exact`, so a device with only one camera still
+        // works instead of throwing.
+        video: { facingMode: { ideal: which }, width: { ideal: 2560 } },
       });
       streamRef.current = stream;
+      setFacing(which);
       setCameraOn(true);
+
+      // Only offer the switch when there really is more than one camera.
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        setCanSwitch(devices.filter((device) => device.kind === "videoinput").length > 1);
+      } catch {
+        setCanSwitch(false);
+      }
+
       // The element only exists once the state has rendered.
       requestAnimationFrame(() => {
         if (videoRef.current) videoRef.current.srcObject = stream;
@@ -214,13 +235,28 @@ export function ScanWidget() {
             autoPlay
             playsInline
             muted
-            className="block max-h-[60vh] w-full object-contain"
+            className={cn(
+              "block max-h-[60vh] w-full object-contain",
+              // A front camera is mirrored, or moving the page left appears to
+              // move it right. The captured frame is not flipped — only what
+              // is on screen.
+              facing === "user" && "scale-x-[-1]",
+            )}
           />
           <div className="flex flex-wrap items-center justify-center gap-3 bg-card p-4">
             <Button size="lg" onClick={capture}>
               <Camera aria-hidden="true" />
               Take the picture
             </Button>
+            {canSwitch && (
+              <Button
+                variant="secondary"
+                onClick={() => startCamera(facing === "environment" ? "user" : "environment")}
+              >
+                <SwitchCamera aria-hidden="true" />
+                {facing === "environment" ? "Front camera" : "Rear camera"}
+              </Button>
+            )}
             <Button variant="secondary" onClick={stopCamera}>
               Done
             </Button>
@@ -228,7 +264,7 @@ export function ScanWidget() {
         </div>
       ) : (
         <div className="flex flex-wrap gap-3">
-          <Button onClick={startCamera}>
+          <Button onClick={() => startCamera()}>
             <Camera aria-hidden="true" />
             Use the camera
           </Button>
@@ -397,7 +433,7 @@ export function ScanWidget() {
                 <FileDown aria-hidden="true" />
                 Make a PDF of {pages.length} {pages.length === 1 ? "page" : "pages"}
               </Button>
-              <Button size="lg" variant="secondary" onClick={startCamera}>
+              <Button size="lg" variant="secondary" onClick={() => startCamera()}>
                 <ImagePlus aria-hidden="true" />
                 Add another page
               </Button>
