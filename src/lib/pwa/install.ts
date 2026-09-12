@@ -42,14 +42,42 @@ function start() {
   });
 }
 
-/** True when the site is already running as an installed app. */
+/**
+ * True when this is not an ordinary browser tab.
+ *
+ * An installed app can report any of several display modes depending on how it
+ * was installed and which browser did it — `standalone` is the common one, but
+ * a window with a title bar reports `window-controls-overlay`, and a
+ * minimal-chrome install reports `minimal-ui`. Checking only `standalone`
+ * misses those, which is why the link kept appearing.
+ *
+ * Electron is checked too: it reports no special display mode at all, so
+ * without this the desktop build would show an Install link for something
+ * already installed.
+ */
+const DISPLAY_MODES = [
+  "standalone",
+  "minimal-ui",
+  "fullscreen",
+  "window-controls-overlay",
+];
+
 export function isInstalled(): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    // Safari on iOS reports it here instead.
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
+
+  if (DISPLAY_MODES.some((mode) => window.matchMedia(`(display-mode: ${mode})`).matches)) {
+    return true;
+  }
+
+  // Safari on iOS reports it here rather than through a media query.
+  if ((window.navigator as Navigator & { standalone?: boolean }).standalone === true) {
+    return true;
+  }
+
+  // The desktop application.
+  if (/electron/i.test(window.navigator.userAgent)) return true;
+
+  return false;
 }
 
 export function useInstall() {
@@ -63,8 +91,18 @@ export function useInstall() {
 
     const listener = (next: InstallEvent | null) => setEvent(next);
     listeners.add(listener);
+
+    // The display mode changes when an app is installed or launched from the
+    // home screen without a reload, so it is watched rather than read once.
+    const queries = DISPLAY_MODES.map((mode) => window.matchMedia(`(display-mode: ${mode})`));
+    const recheck = () => setInstalled(isInstalled());
+    queries.forEach((query) => query.addEventListener("change", recheck));
+    window.addEventListener("appinstalled", recheck);
+
     return () => {
       listeners.delete(listener);
+      queries.forEach((query) => query.removeEventListener("change", recheck));
+      window.removeEventListener("appinstalled", recheck);
     };
   }, []);
 
