@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ThemeProvider } from "@/components/site/ThemeProvider";
@@ -10,17 +10,31 @@ import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { site } from "@/lib/site";
 import "./globals.css";
 
+/**
+ * Both families include Cyrillic.
+ *
+ * Previously only the Latin subset was requested, which meant every Russian
+ * page fell back to whatever the operating system supplied — while still
+ * downloading two Latin fonts to render text they had no glyphs for.
+ *
+ * Plus Jakarta Sans was the display face before. It has no Cyrillic at all, so
+ * it has been replaced by Manrope, which is close in character and does.
+ */
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   variable: "--font-inter",
   display: "swap",
 });
 
-const display = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+const display = Manrope({
+  subsets: ["latin", "cyrillic"],
   weight: ["500", "600", "700"],
   variable: "--font-display",
   display: "swap",
+  // Headings appear below the fold on some pages, so preloading every weight
+  // downloads files the browser may not use — which is what Chrome warns
+  // about. Loaded on demand instead.
+  preload: false,
 });
 
 export const metadata: Metadata = {

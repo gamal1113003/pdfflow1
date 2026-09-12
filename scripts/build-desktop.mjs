@@ -300,8 +300,9 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
   // installed. The desktop build is not a progressive web app, so the
   // browser-based detection that hides these on the web cannot see it — they
   // are removed here instead.
-  await removeIfPresent(path.join(work, "src/app/download"));
-  await removeIfPresent(path.join(work, "src/app/ru/download"));
+  // The download pages are left in place deliberately. Removing them while a
+  // link somewhere still points there produces a 404, which is worse than a
+  // page explaining that the app is already installed.
   await removeIfPresent(path.join(work, "src/app/offline"));
   await removeIfPresent(path.join(work, "src/app/ru/offline"));
 

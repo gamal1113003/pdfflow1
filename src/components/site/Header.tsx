@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageToggle } from "@/components/site/LanguageToggle";
+import { InstallLink } from "@/components/site/InstallLink";
 import { ToolIcon } from "@/components/tools/ToolIcon";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,12 +63,7 @@ export function Header() {
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            href={pathFor(language, "/download")}
-            className="inline-flex h-9 items-center rounded-full px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            {t.footer.download}
-          </Link>
+          <InstallLink />
           <LanguageToggle />
           <ThemeToggle />
           <Button asChild variant="ghost" size="sm">
