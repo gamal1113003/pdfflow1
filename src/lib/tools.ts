@@ -32,6 +32,12 @@ export type ToolWidget =
   | "invoice"
   | "application"
   | "qr"
+  | "page-numbers"
+  | "pdf-to-text"
+  | "extract-images"
+  | "pages-per-sheet"
+  | "metadata"
+  | "image-optimise"
   | "backend";
 
 export type Tool = {
@@ -386,6 +392,99 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "page-numbers",
+    name: "Add Page Numbers",
+    description: "Number the pages of a document.",
+    lede: "Put page numbers where you want them, in any style.",
+    categories: ["edit"],
+    icon: "Hash",
+    widget: "page-numbers",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Add Page Numbers to PDF Online — Free | orzix",
+      description:
+        "Add page numbers to a PDF in any position and style. Skip a cover page or continue numbering from another document. Runs in your browser.",
+    },
+  },
+  {
+    slug: "pdf-to-text",
+    name: "PDF to Text",
+    description: "Pull the plain text out of a document.",
+    lede: "Get the words out of a PDF, as a plain text file.",
+    categories: ["convert-from-pdf"],
+    icon: "FileText",
+    widget: "pdf-to-text",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "PDF to Text Online — Extract Text from PDF | orzix",
+      description:
+        "Extract the text from a PDF and download it as a .txt file, or copy it straight to the clipboard. Runs entirely in your browser.",
+    },
+  },
+  {
+    slug: "extract-images",
+    name: "Extract Images",
+    description: "Save the pictures stored inside a PDF.",
+    lede: "Pull out the images a document contains, at their original resolution.",
+    categories: ["convert-from-pdf", "image"],
+    icon: "Images",
+    widget: "extract-images",
+    runsInBrowser: true,
+    seo: {
+      title: "Extract Images from PDF Online — Free | orzix",
+      description:
+        "Save the images embedded in a PDF at their original resolution, rather than pictures of the pages. Runs in your browser.",
+    },
+  },
+  {
+    slug: "pages-per-sheet",
+    name: "Pages per Sheet",
+    description: "Fit several pages onto one sheet for printing.",
+    lede: "Print two, four or more pages on a single sheet.",
+    categories: ["organize"],
+    icon: "LayoutGrid",
+    widget: "pages-per-sheet",
+    runsInBrowser: true,
+    seo: {
+      title: "Pages per Sheet — Print Multiple PDF Pages on One Page | orzix",
+      description:
+        "Lay out two, four, six or nine PDF pages on a single sheet to save paper. Runs entirely in your browser.",
+    },
+  },
+  {
+    slug: "pdf-metadata",
+    name: "PDF Details",
+    description: "See and change what a document says about itself.",
+    lede: "Read the hidden details in a PDF, edit them, or remove them.",
+    categories: ["edit", "security"],
+    icon: "Tags",
+    widget: "metadata",
+    runsInBrowser: true,
+    seo: {
+      title: "Edit or Remove PDF Metadata Online — Free | orzix",
+      description:
+        "See the author, title and software recorded inside a PDF, change them, or clear them entirely. Runs in your browser.",
+    },
+  },
+  {
+    slug: "compress-image",
+    name: "Compress Images",
+    description: "Make photos and screenshots smaller.",
+    lede: "Shrink images for email, messages or a web page.",
+    categories: ["image", "compress"],
+    icon: "ImageDown",
+    widget: "image-optimise",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Compress Images Online — Smaller JPG, PNG and WEBP | orzix",
+      description:
+        "Make images smaller for email or the web. Resize, choose the quality, convert between JPG, PNG and WEBP. Runs entirely in your browser.",
     },
   },
   {

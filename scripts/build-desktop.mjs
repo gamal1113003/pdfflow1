@@ -331,12 +331,17 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
     .replace(/^\s*manifest: "\/site\.webmanifest",$\n/m, "");
   await writeFile(layoutInstallPath, layoutInstall);
 
-  // The header links to pages that no longer exist.
+  // Neither sign-in nor sign-up belongs in the desktop application: there is
+  // no account behind it, nothing is stored anywhere, and the pages they lead
+  // to were removed from this build. Both buttons go entirely rather than
+  // being repointed somewhere harmless — a button that does something other
+  // than what it says is worse than no button.
   const headerPath = path.join(work, "src/components/site/Header.tsx");
   let header = await readFile(headerPath, "utf8");
-  header = header
-    .replace(/\s*<Button asChild variant="ghost" size="sm">\s*<Link href=\{pathFor\(language, "\/login"\)\}>Log in<\/Link>\s*<\/Button>/g, "")
-    .replace(/<Link href=\{pathFor\(language, "\/signup"\)\}>/g, '<Link href={pathFor(language, "/tools")}>');
+  header = header.replace(
+    /\s*<Button asChild variant="ghost" size="sm">\s*<Link href=\{pathFor\(language, "\/login"\)\}>Log in<\/Link>\s*<\/Button>\s*<Button asChild size="sm">\s*<Link href=\{pathFor\(language, "\/signup"\)\}>\{t\.nav\.getStarted\}<\/Link>\s*<\/Button>/g,
+    "",
+  );
   await writeFile(headerPath, header);
 
   const footerPath = path.join(work, "src/components/site/Footer.tsx");
