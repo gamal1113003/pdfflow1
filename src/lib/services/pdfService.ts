@@ -18,7 +18,8 @@ export type ServiceJob =
   | "ppt-to-pdf"
   | "protect-pdf"
   | "unlock-pdf"
-  | "ocr-pdf";
+  | "ocr-pdf"
+  | "pdf-to-pdfa";
 
 // `||` rather than `??`: an empty NEXT_PUBLIC_PDF_API_URL should fall back to
 // the built-in route, not be treated as a configured value. `??` only catches

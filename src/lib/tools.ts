@@ -40,6 +40,11 @@ export type ToolWidget =
   | "image-optimise"
   | "fill-form"
   | "scan"
+  | "repair"
+  | "stamps"
+  | "bookmark-split"
+  | "poster"
+  | "merge-contents"
   | "backend";
 
 export type Tool = {
@@ -394,6 +399,99 @@ export const tools: Tool[] = [
       title: "Flatten PDF Online — Lock Form Fields | orzix",
       description:
         "Flatten a PDF so form fields and annotations become fixed page content that cannot be edited or removed.",
+    },
+  },
+  {
+    slug: "repair-pdf",
+    name: "Repair PDF",
+    description: "Try to open a file that will not open.",
+    lede: "Rebuild a damaged PDF so it can be read again.",
+    categories: ["security", "edit"],
+    icon: "Wrench",
+    widget: "repair",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Repair a Damaged PDF Online — Free | orzix",
+      description:
+        "A PDF that will not open can often be rebuilt from what survives inside it. Runs in your browser; nothing is uploaded.",
+    },
+  },
+  {
+    slug: "header-footer",
+    name: "Header and Footer",
+    description: "Add running text to the top or bottom of every page.",
+    lede: "Put a title, date or reference on every page.",
+    categories: ["edit"],
+    icon: "Type",
+    widget: "stamps",
+    runsInBrowser: true,
+    seo: {
+      title: "Add a Header or Footer to a PDF Online — Free | orzix",
+      description:
+        "Add running text to the top or bottom of every page of a PDF, in any of six positions, with automatic page numbers and dates.",
+    },
+  },
+  {
+    slug: "split-by-bookmarks",
+    name: "Split by Bookmarks",
+    description: "Break a document apart at its chapter marks.",
+    lede: "Split a long document at its own bookmarks, one file per section.",
+    categories: ["organize"],
+    icon: "Bookmark",
+    widget: "bookmark-split",
+    runsInBrowser: true,
+    seo: {
+      title: "Split a PDF by Bookmarks Online — One File per Chapter | orzix",
+      description:
+        "Break a long PDF into separate files at its bookmarks, each named after its section. Runs entirely in your browser.",
+    },
+  },
+  {
+    slug: "poster",
+    name: "Poster",
+    description: "Print one page across several sheets.",
+    lede: "Enlarge a page across several sheets to make a poster.",
+    categories: ["organize"],
+    icon: "Expand",
+    widget: "poster",
+    runsInBrowser: true,
+    seo: {
+      title: "Print a PDF as a Poster Across Several Sheets | orzix",
+      description:
+        "Split a PDF page across several sheets of paper with a trimming overlap, so it can be joined into a poster. Runs in your browser.",
+    },
+  },
+  {
+    slug: "merge-with-contents",
+    name: "Merge with Contents",
+    description: "Combine files and add a clickable index.",
+    lede: "Combine documents into a bundle with an index at the front.",
+    categories: ["organize"],
+    icon: "ListOrdered",
+    widget: "merge-contents",
+    runsInBrowser: true,
+    popular: true,
+    seo: {
+      title: "Merge PDFs with a Table of Contents — Free Online | orzix",
+      description:
+        "Combine several documents into one bundle with a clickable index page and sidebar bookmarks. Runs entirely in your browser.",
+    },
+  },
+  {
+    slug: "pdf-to-pdfa",
+    name: "PDF to PDF/A",
+    description: "Convert to the archival format.",
+    lede: "Convert a PDF to PDF/A, the format required for long-term filing.",
+    categories: ["convert-from-pdf", "security"],
+    icon: "Archive",
+    widget: "backend",
+    runsInBrowser: false,
+    config: { accept: ["pdf"], outputLabel: "PDF/A document" },
+    seo: {
+      title: "Convert PDF to PDF/A Online — Archival Format | orzix",
+      description:
+        "Convert a PDF to PDF/A-2b, the archival standard that embeds everything needed to display the file correctly in future.",
     },
   },
   {
