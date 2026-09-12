@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { ToolContentSection } from "@/components/tools/ToolContentSection";
 import { toolJsonLd } from "@/lib/seo";
 import { getTool } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -49,6 +50,9 @@ export function ToolPageLayout({ slug, locale }: { slug: string; locale?: Langua
 
       </div>
 
+      {/* Only renders on tools that have something written for them, so pages
+          without content look exactly as they did. */}
+      <ToolContentSection slug={slug} language={language} />
     </>
   );
 }
