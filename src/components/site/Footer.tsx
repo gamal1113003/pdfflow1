@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LogoMark } from "@/components/site/Logo";
 import { tools } from "@/lib/tools";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useInstall } from "@/lib/pwa/install";
 import { pathFor } from "@/lib/i18n/locale";
 import { translateTool } from "@/lib/i18n/toolStrings";
 
@@ -18,6 +19,7 @@ const TOOL_LINKS = [
 
 export function Footer() {
   const { language, t } = useLanguage();
+  const { installed } = useInstall();
 
   const columns = [
     {
@@ -34,7 +36,8 @@ export function Footer() {
       heading: t.footer.company,
       links: [
         { label: t.footer.about, href: "/about" },
-        { label: t.footer.download, href: "/download" },
+        // Nothing to install when it is already installed.
+        ...(installed ? [] : [{ label: t.footer.download, href: "/download" }]),
         { label: t.footer.contact, href: "/contact" },
       ],
     },

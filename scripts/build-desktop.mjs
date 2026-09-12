@@ -296,31 +296,39 @@ export default function ${isRu ? "RuHome" : "Home"}Page() {
     console.log(`  Marked as local: ${nowLocal.join(", ")}`);
   }
 
-  // A breadcrumb suits a website, where people arrive from a search result deep
-  // inside the site. In an application the useful thing is one obvious way back
-  // to the list of tools.
-  const layoutToolPath = path.join(work, "src/components/tools/ToolPageLayout.tsx");
-  let layoutTool = await readFile(layoutToolPath, "utf8");
-  layoutTool = layoutTool
-    .replace(
-      /import \{[^}]*\} from "lucide-react";/,
-      'import { ArrowLeft } from "lucide-react";',
-    )
-    .replace(
-      /<nav aria-label=\{t\.toolPage\.breadcrumb\}[\s\S]*?<\/nav>/,
-      [
-        '<div className="mb-8">',
-        '          <Link',
-        '            href={pathFor(language, "/tools")}',
-        '            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-foreground/20 hover:bg-muted"',
-        '          >',
-        '            <ArrowLeft className="size-4" aria-hidden="true" />',
-        '            {t.nav.browseAll}',
-        '          </Link>',
-        '        </div>',
-      ].join("\n"),
-    );
-  await writeFile(layoutToolPath, layoutTool);
+  // Nothing about installing belongs in an application that is already
+  // installed. The desktop build is not a progressive web app, so the
+  // browser-based detection that hides these on the web cannot see it — they
+  // are removed here instead.
+  await removeIfPresent(path.join(work, "src/app/download"));
+  await removeIfPresent(path.join(work, "src/app/ru/download"));
+  await removeIfPresent(path.join(work, "src/app/offline"));
+  await removeIfPresent(path.join(work, "src/app/ru/offline"));
+
+  const headerPathInstall = path.join(work, "src/components/site/Header.tsx");
+  let headerInstall = await readFile(headerPathInstall, "utf8");
+  headerInstall = headerInstall
+    .replace(/\s*<InstallLink \/>/g, "")
+    .replace(/^\s*import \{ InstallLink \}.*$\n/m, "");
+  await writeFile(headerPathInstall, headerInstall);
+
+  const footerPathInstall = path.join(work, "src/components/site/Footer.tsx");
+  let footerInstall = await readFile(footerPathInstall, "utf8");
+  footerInstall = footerInstall.replace(
+    /\s*\{ label: t\.footer\.download, href: "\/download" \},/g,
+    "",
+  );
+  await writeFile(footerPathInstall, footerInstall);
+
+  // A service worker and an install banner make no sense inside Electron: the
+  // files are already local, and there is nothing to install.
+  const layoutInstallPath = path.join(work, "src/app/layout.tsx");
+  let layoutInstall = await readFile(layoutInstallPath, "utf8");
+  layoutInstall = layoutInstall
+    .replace(/^\s*import \{ (ServiceWorker|InstallPrompt) \}.*$\n/gm, "")
+    .replace(/\s*<(ServiceWorker|InstallPrompt) \/>/g, "")
+    .replace(/^\s*manifest: "\/site\.webmanifest",$\n/m, "");
+  await writeFile(layoutInstallPath, layoutInstall);
 
   // The header links to pages that no longer exist.
   const headerPath = path.join(work, "src/components/site/Header.tsx");
